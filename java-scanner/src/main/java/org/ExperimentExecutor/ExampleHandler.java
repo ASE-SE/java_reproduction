@@ -27,6 +27,8 @@ public class ExampleHandler {
     public static String EXAMPLE_REPO_PATH;
     public static String EXAMPLE_RESULT_PATH;
     public static String EXPERIMENT_DATA_PATH;
+    public static Set<String> REPO_FILTER = Collections.emptySet();
+    public static int SAMPLE_LIMIT = 0;
     private static List<ExampleData> rawExampleData;
     private static List<ExampleData> rawResultData;
     private static Map<String, List<ExampleData>> exampleData = new HashMap<>(); // 以仓库名为键进行分组记录的实验前数据
@@ -46,6 +48,15 @@ public class ExampleHandler {
             EXAMPLE_REPO_PATH = prop.getProperty("EXPERIMENT_SOURCE");
             EXAMPLE_RESULT_PATH = prop.getProperty("EXPERIMENT_TARGET");
             EXPERIMENT_DATA_PATH = prop.getProperty("EXPERIMENT_INTERMEDIATE_PROCESS_DATA_PATH");
+            String repoFilter = prop.getProperty("REPO_FILTER", "").trim();
+            if (!repoFilter.isEmpty()) {
+                REPO_FILTER = new HashSet<>(Arrays.asList(repoFilter.split("\\s*,\\s*")));
+            }
+            try {
+                SAMPLE_LIMIT = Integer.parseInt(prop.getProperty("SAMPLE_LIMIT", "0").trim());
+            } catch (NumberFormatException nfe) {
+                SAMPLE_LIMIT = 0;
+            }
         } catch (IOException e) {
             LOGGER.severe("config loading failed: " + e.getMessage());
             throw new RuntimeException(e);
@@ -134,15 +145,21 @@ public class ExampleHandler {
      * @return 下一条未被实验的数据，若无可选取数据，返回null
      */
     public static ExampleData getNextData(boolean withFilter) {
+        if (SAMPLE_LIMIT > 0 && rawResultData != null && rawResultData.size() >= SAMPLE_LIMIT) {
+            LOGGER.info("SAMPLE_LIMIT=" + SAMPLE_LIMIT + " reached, stopping.");
+            return null;
+        }
         if (!withFilter) {
             for (ExampleData exampleData1: rawExampleData) {
                 if (dataInResult(exampleData1)) continue;
+                if (!REPO_FILTER.isEmpty() && !REPO_FILTER.contains(exampleData1.getRepo_id())) continue;
                 return exampleData1;
             }
             return null;
         }
         for (ExampleData exampleData1: rawExampleData) {
             if (dataInResult(exampleData1)) continue;
+            if (!REPO_FILTER.isEmpty() && !REPO_FILTER.contains(exampleData1.getRepo_id())) continue;
 
             // 排除一些无法解析的仓库
             if (exampleData1.getRepo_id().equals("junit-team/junit5") ||

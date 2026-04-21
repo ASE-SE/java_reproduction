@@ -38,18 +38,31 @@ public class Main {
     public static void main(String[] args) throws IOException {
         loggerInit();
         LOGGER.info("experiment process start.");
+        if (!ExampleHandler.REPO_FILTER.isEmpty()) {
+            LOGGER.info("REPO_FILTER active, only processing: " + ExampleHandler.REPO_FILTER);
+        }
+        if (ExampleHandler.SAMPLE_LIMIT > 0) {
+            LOGGER.info("SAMPLE_LIMIT=" + ExampleHandler.SAMPLE_LIMIT);
+        }
         ExampleHandler.ExampleData processingData = ExampleHandler.getNextData(false);
         while (processingData != null) {
-//            List<ExampleHandler.ExampleData> results = processExample(processingData);
-            List<ExampleHandler.ExampleData> results = processSingleExample(processingData);
+            List<ExampleHandler.ExampleData> results = null;
+            try {
+                results = processSingleExample(processingData);
+            } catch (Throwable t) {
+                LOGGER.log(Level.SEVERE,
+                        "unrecoverable failure on sample " + processingData.getMethodName()
+                                + " in " + processingData.getRepo_id() + "; marking label=-1 and continuing",
+                        t);
+                ExampleHandler.ExampleData failed = new ExampleHandler.ExampleData(processingData);
+                failed.setLabel(-1);
+                results = List.of(failed);
+            }
             ExampleHandler.addResults(results);
             ExampleHandler.writeResultData();
             processingData = ExampleHandler.getNextData(false);
         }
         LOGGER.info("finished.");
-
-//        mainContent();
-//        test();
     }
 
     private static void loggerInit() throws IOException{
