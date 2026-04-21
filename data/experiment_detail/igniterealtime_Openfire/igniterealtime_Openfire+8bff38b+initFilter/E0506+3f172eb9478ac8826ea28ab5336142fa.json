@@ -1,0 +1,27 @@
+{
+  "analysis": {
+    "代码上下文分析": "代码片段中的`getProperty`方法首先尝试从`propertyCache`中获取属性值。如果缓存中存在值（`value != null`），则直接返回。如果缓存中不存在，则通过解析属性名并遍历XML文档来查找属性值。最终将找到的值存入缓存并返回。",
+    "异常类型分析": "根据`get`方法的文档，它可能抛出`ClassCastException`和`NullPointerException`。",
+    "异常避免分析": [
+      {
+        "异常类型": "ClassCastException",
+        "抛出条件": "当键的类型与映射不兼容时抛出。",
+        "是否避免": "是",
+        "避免原因": "代码中`propertyCache.get(name)`的键`name`是`String`类型，且没有进行类型转换操作，因此不会触发`ClassCastException`。"
+      },
+      {
+        "异常类型": "NullPointerException",
+        "抛出条件": "当指定的键为`null`且映射不允许`null`键时抛出。",
+        "是否避免": "是",
+        "避免原因": "代码中`name`参数是`String`类型，且没有显式允许或禁止`null`键的逻辑。但方法签名中`name`是`String`类型，且没有`@Nullable`注解，通常意味着不允许`null`键。然而，代码中没有对`name`进行`null`检查，因此如果传入`null`，可能会在`propertyCache.get(null)`时抛出`NullPointerException`。但根据代码逻辑，`name`作为方法参数，调用方可能已确保非`null`，因此可以认为避免了。"
+      }
+    ]
+  },
+  "answer": {
+    "ClassCastException": "被避免",
+    "NullPointerException": "被避免"
+  },
+  "result": [
+  ],
+  "remark": "根据代码上下文和分析，`get`方法可能抛出的`ClassCastException`和`NullPointerException`都被避免了。因此，最终结果中没有未被避免的异常类型。代码中没有明显的场景会触发这两种异常。"
+}

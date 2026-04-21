@@ -1,0 +1,11 @@
+{
+  "analysis": "代码片段中调用了`MessageFormat`类的`applyPattern`方法，并传入了从资源包中获取的字符串`value`作为参数。根据`applyPattern`方法的文档，它可能抛出两种异常：`IllegalArgumentException`和`NullPointerException`。分析代码上下文：1. `value`是从`bundle.getString(key)`获取的，如果`key`对应的资源不存在，会触发`MissingResourceException`，但`value`不会为`null`，因此`NullPointerException`被避免。2. `applyPattern`方法的`IllegalArgumentException`会在模式无效时抛出，但代码中未对`value`的内容进行有效性检查，因此该异常未被避免。",
+  "answer": {
+    "IllegalArgumentException": "未被避免",
+    "NullPointerException": "被避免"
+  },
+  "result": [
+    "IllegalArgumentException"
+  ],
+  "remark": "在代码片段中，`applyPattern`方法的`IllegalArgumentException`可能在`value`包含无效模式时触发。例如，如果资源包中的字符串包含不符合`MessageFormat`语法规则的模式（如未闭合的大括号），则会抛出此异常。代码中未对`value`的内容进行预检查，因此该异常未被避免。"
+}

@@ -1,0 +1,6 @@
+{
+  "analysis": "代码片段中调用`executor.execute(active)`方法，其中`active`是从`tasks.poll()`获取的任务。`tasks.poll()`在队列为空时会返回`null`，但代码中通过`if ((active=tasks.poll()) != null)`确保了只有非空任务才会被提交给`executor.execute`执行，因此`NullPointerException`被避免。关于`RejectedExecutionException`，代码片段中没有对`executor`的状态进行检查，例如线程池是否已关闭或是否无法接受新任务。因此，`RejectedExecutionException`未被避免。",
+  "answer": "NullPointerException 的抛出条件（command 为 null）被避免；RejectedExecutionException 的抛出条件（任务无法被接受执行）未被避免。",
+  "result": ["RejectedExecutionException"],
+  "remark": "在代码片段中，当线程池（executor）处于无法接受新任务的状态（例如已关闭或资源耗尽）时，调用`executor.execute(active)`会抛出`RejectedExecutionException`。代码未对线程池状态进行检查，因此该异常可能在运行时触发。"
+}

@@ -1,0 +1,11 @@
+{
+  "analysis": "代码片段中调用了`substring`方法两次：一次是`line.substring(0, separatorIndex)`，另一次是`line.substring(separatorIndex + 1)`。根据`substring`方法的文档，它可能抛出`IndexOutOfBoundsException`异常，当`beginIndex`为负数或大于字符串长度时。在第一次调用中，`separatorIndex`是通过`indexOf`方法获得的，如果找不到分隔符，`separatorIndex`会是-1，但代码中通过条件判断`separatorIndex != -1`避免了这种情况。在第二次调用中，`separatorIndex + 1`可能会超过字符串长度，但代码中没有显式检查这一点。",
+  "answer": {
+    "IndexOutOfBoundsException": {
+      "avoided": false,
+      "reason": "在`line.substring(separatorIndex + 1)`调用中，如果`separatorIndex + 1`大于`line.length()`，会抛出`IndexOutOfBoundsException`，而代码中没有检查这种情况。"
+    }
+  },
+  "result": ["IndexOutOfBoundsException"],
+  "remark": "在代码片段中，`line.substring(separatorIndex + 1)`可能会在`separatorIndex + 1`大于`line.length()`时触发`IndexOutOfBoundsException`。例如，当`line`是空字符串或`separatorIndex`是`line.length() - 1`时，`separatorIndex + 1`会等于`line.length()`，此时调用`substring`是安全的，但如果`separatorIndex`更大，就会抛出异常。"
+}

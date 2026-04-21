@@ -1,0 +1,22 @@
+{
+  "analysis": "代码片段中的`getName`方法通过调用`substring`方法来获取路径的相对名称。在调用`substring`之前，代码进行了以下检查：1. 如果路径是根目录，直接返回分隔符，不调用`substring`；2. 对于非根路径，获取绝对路径后，查找最后一个'/'的位置；3. 根据`index`的值决定调用`substring`的方式：如果`index > 0`，则从`index + 1`开始截取，否则从位置1开始截取。`substring`方法可能抛出`IndexOutOfBoundsException`异常，当`beginIndex`为负数或超过字符串长度时。在代码中，`abs.substring(index + 1)`和`abs.substring(1)`的调用中，`index`是通过`lastIndexOf`得到的，其值最小为-1（未找到），最大为字符串长度减1。对于`abs.substring(index + 1)`，当`index > 0`时，`index + 1`至少为1，不会为负，但可能超过字符串长度（例如，当`index`等于字符串长度减1时，`index + 1`等于字符串长度，此时`substring`会抛出异常）。对于`abs.substring(1)`，当`index <= 0`时调用，如果`abs`的长度为0或1，`beginIndex`为1会超过字符串长度，抛出异常。",
+  "answer": {
+    "IndexOutOfBoundsException": {
+      "avoided": "部分避免",
+      "conditions": [
+        {
+          "condition": "beginIndex is negative",
+          "avoided": true,
+          "reason": "`index`来自`lastIndexOf`，最小为-1。`index > 0`时`index + 1`至少为1；`index <= 0`时调用`substring(1)`，1非负。"
+        },
+        {
+          "condition": "beginIndex larger than the length of the string",
+          "avoided": false,
+          "reason": "当`index`等于字符串长度减1时，`index + 1`等于字符串长度，会抛出异常；当`abs`长度小于等于1时，`substring(1)`会抛出异常。"
+        }
+      ]
+    }
+  },
+  "result": ["IndexOutOfBoundsException"],
+  "remark": "在代码片段中，`IndexOutOfBoundsException`未被完全避免。具体触发场景包括：1. 当`abs`的最后一个字符是'/'且`index`为`abs.length() - 1`时，`abs.substring(index + 1)`中的`beginIndex`等于`abs.length()`，抛出异常；2. 当`abs`的长度为0或1且`index <= 0`时，`abs.substring(1)`中的`beginIndex`为1，超过字符串长度，抛出异常。"
+}

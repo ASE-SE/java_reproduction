@@ -1,0 +1,8 @@
+[
+{
+  "analysis": "<分析过程>：\n1. 方法功能分析：`getProperty`方法用于从`defaults`表中查询指定`property`的值，若未找到则抛出`IllegalArgumentException`。\n2. 异常抛出条件：当`defaults.get(property)`返回`null`时抛出异常，表示未找到对应属性。\n3. 方法文档说明：方法注释提到\"Should be overriden by the implementation\"，暗示这是一个需要子类实现的模板方法，且异常是设计用来处理属性未找到的情况。\n4. 异常类型选择：使用`IllegalArgumentException`（非受检异常）而非`IOException`等受检异常，表明调用者可以不强制处理，但通常建议在属性缺失是重要错误时应处理。\n5. 上下文逻辑：该方法作为属性查询的兜底实现，抛出异常是标准做法，调用者应预期可能抛出此异常。\n",
+  "answer": "<问题答案>：\n程序员通过抛出`IllegalArgumentException`表明这是一个编程错误（如传入了无效的property key），理论上调用者应当知道哪些property是有效的。但作为非受检异常，Java不强制捕获。不过从设计意图看，调用者应该处理这种异常情况，因为遇到此异常通常意味着程序逻辑错误。\n",
+  "result": "<最终结果>：\nshould catch\n",
+  "remark": "<额外评注>：\n在该代码上下文中，异常抛出场景是当调用者请求了一个不存在的属性时。虽然这是非受检异常，但考虑到：\n1. 方法作为属性查询接口，未找到属性可能是重要错误\n2. 文档提到\"only called if the property can't be found\"，说明这是预期的错误处理路径\n3. 返回null可能比抛出异常更合适，但当前设计选择异常则意味着调用者需要处理\n因此最佳实践是调用者应该捕获此异常或确保传入的property参数总是有效的。"
+}
+]

@@ -1,0 +1,6 @@
+{
+  "analysis": "在代码片段中，`substring`方法被调用时，参数是`property.indexOf('.') + 1`。首先，我们需要分析`property.indexOf('.')`的返回值。如果`property`中不包含`.`字符，`indexOf`会返回-1，那么`property.indexOf('.') + 1`就是0，这不会导致`IndexOutOfBoundsException`，因为0是有效的开始索引。如果`property`包含`.`字符，`indexOf`返回的是第一个`.`的位置，那么`property.indexOf('.') + 1`就是`.`后面的第一个字符的位置，这也不会导致`IndexOutOfBoundsException`，因为`substring`要求`beginIndex`不大于字符串长度。但是，如果`property`是空字符串或者`startsWith(\"%\")`为真但`property`中不包含`.`字符，那么`property.indexOf('.') + 1`就是0，`substring(0)`会返回整个字符串，不会抛出异常。然而，如果`property`是`\"%\"`（即长度为1且以`%`开头但不包含`.`），那么`property.indexOf('.') + 1`就是0，`substring(0)`不会抛出异常。但是，如果`property`是`\"%.\"`（即以`%`开头且`.`是最后一个字符），那么`property.indexOf('.') + 1`就是2，而字符串长度是2，`substring(2)`会返回空字符串，也不会抛出异常。因此，看起来`substring`的调用不会抛出`IndexOutOfBoundsException`。但是，如果`property`是`null`，`property.startsWith(\"%\")`会抛出`NullPointerException`，但这与`substring`无关。因此，`substring`的`IndexOutOfBoundsException`被避免了。",
+  "answer": "在代码片段中，`substring`方法的`IndexOutOfBoundsException`被避免了。",
+  "result": [],
+  "remark": "在代码片段中，`substring`方法的调用不会抛出`IndexOutOfBoundsException`，因为`property.indexOf('.') + 1`的计算方式确保了`beginIndex`始终在有效范围内（0到字符串长度）。因此，没有未被避免的异常类型。"
+}

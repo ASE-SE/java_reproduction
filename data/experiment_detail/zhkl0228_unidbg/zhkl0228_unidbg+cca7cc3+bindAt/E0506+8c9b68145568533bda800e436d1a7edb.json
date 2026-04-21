@@ -1,0 +1,8 @@
+[
+{
+  "analysis": "分析该代码片段，`throw new IllegalStateException(\"bad bind type \" + type);` 出现在两个 `switch` 语句的 `default` 分支中，分别对应不同的 `type` 值。\n\n1. **第一个 `switch` 语句**：\n   - 位于 `if (bindAt > 0)` 块内，处理 `BIND_TYPE_POINTER`、`BIND_TYPE_TEXT_ABSOLUTE32` 和 `BIND_TYPE_TEXT_PCREL32` 等类型。\n   - 如果 `type` 不匹配任何 `case`，则抛出 `IllegalStateException`。\n\n2. **第二个 `switch` 语句**：\n   - 位于 `long bindAt=symbol.getAddress();` 块内，处理 `BIND_TYPE_POINTER`、`BIND_TYPE_TEXT_ABSOLUTE32` 和 `BIND_TYPE_TEXT_PCREL32` 等类型。\n   - 类似地，如果 `type` 不匹配任何 `case`，则抛出 `IllegalStateException`。\n\n从上下文看，`type` 应该是预期的有限枚举值（如 `BIND_TYPE_POINTER`、`BIND_TYPE_TEXT_ABSOLUTE32` 或 `BIND_TYPE_TEXT_PCREL32`）。如果 `type` 是其他值，说明调用者传入了非法或不支持的类型，此时抛出 `IllegalStateException` 是合理的。\n\n`IllegalStateException` 是运行时异常（`RuntimeException` 的子类），通常表示程序状态非法，而非调用者需要显式处理的错误。因此，程序员可能**不期望**调用者捕获此异常，而是希望程序终止或由上层框架处理。",
+  "answer": "程序员抛出的 `IllegalStateException` 通常表示程序状态非法（如传入了不支持的 `type` 值），而非调用者需要显式处理的错误。因此，程序员**不期望**调用者捕获此异常。",
+  "result": "no catch",
+  "remark": "该异常在 `switch` 的 `default` 分支中抛出，表示 `type` 的值非法或不受支持。这是一种编程错误（`bug`），而非调用者需要显式处理的运行时错误。因此，程序员不期望调用者捕获此异常，而是希望程序终止或由上层框架记录错误。"
+}
+]

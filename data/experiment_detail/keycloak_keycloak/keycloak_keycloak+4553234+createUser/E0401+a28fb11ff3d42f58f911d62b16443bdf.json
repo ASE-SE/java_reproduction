@@ -1,0 +1,14 @@
+[
+{
+  "analysis": "在代码片段中，`updateCredential`方法处理用户凭证更新。当`cred.getValue()`不为null时，方法尝试更新凭证。如果更新过程中遇到`ModelException`，方法会抛出一个`PasswordPolicyNotMetException`，这是一个运行时异常。这个异常包装了原始异常的信息、用户名和原始异常本身。从上下文来看，`PasswordPolicyNotMetException`可能表示密码策略不符合要求，这是一个业务逻辑上的错误，可能需要调用者知晓并处理。",
+  "answer": "程序员可能希望调用者捕获并处理这个运行时异常，因为它表示一个业务逻辑上的错误（密码策略不符合要求），调用者可能需要根据这个异常采取相应的措施，比如通知用户密码不符合策略。",
+  "result": "should catch",
+  "remark": "`PasswordPolicyNotMetException`的抛出场景是在密码策略检查失败时，这可能是一个需要用户或管理员干预的情况。因此，调用者可能需要捕获这个异常以提供适当的反馈或处理。"
+},
+{
+  "analysis": "在代码片段中，`throw new RuntimeException(ioe);`出现在处理Base64解码可能抛出的IOException的catch块中。这里将检查异常IOException包装为运行时异常RuntimeException抛出。RuntimeException通常表示编程错误或不可恢复的系统错误，调用者可以选择捕获但不强制要求。从上下文看，Base64解码失败可能由于无效输入导致，这属于调用者应确保输入正确性的范畴。",
+  "answer": "程序员不期望调用者必须捕获这个运行时异常，而是希望调用者确保输入的正确性以避免异常发生。",
+  "result": "no catch",
+  "remark": "该RuntimeException是对IO异常的包装，用于将检查异常转为非检查异常。在密码凭证更新场景中，Base64解码失败通常意味着输入数据格式错误，应由调用方提前验证。"
+}
+]

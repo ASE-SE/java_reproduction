@@ -1,0 +1,6 @@
+{
+  "analysis": "代码中调用了`systemNameToComputationIdMap.containsKey(mapTask.getSystemName())`，其中`systemNameToComputationIdMap`是一个Map。根据`containsKey`方法的文档，它可能抛出两种异常：`ClassCastException`和`NullPointerException`。分析代码上下文：1. `mapTask.getSystemName()`的返回值作为`containsKey`的参数，未见对`mapTask.getSystemName()`的返回值进行类型检查或空值检查。2. `systemNameToComputationIdMap`是一个Map，但未明确其具体实现类型，因此无法确定是否允许null键。综合来看，`ClassCastException`和`NullPointerException`的抛出条件均未被显式避免。",
+  "answer": "1. `ClassCastException`的抛出条件（key类型不匹配）未被避免，因为代码未对`mapTask.getSystemName()`的返回值进行类型检查。2. `NullPointerException`的抛出条件（key为null且Map不允许null键）未被避免，因为代码未对`mapTask.getSystemName()`的返回值进行空值检查，且Map的具体实现类型未知。",
+  "result": ["ClassCastException", "NullPointerException"],
+  "remark": "在代码中，`mapTask.getSystemName()`的返回值直接传递给`containsKey`方法，未进行类型或空值检查。如果`mapTask.getSystemName()`返回的值类型与Map的键类型不兼容，将抛出`ClassCastException`；如果返回值为null且Map实现不允许null键（如`HashMap`允许null键，但`TreeMap`不允许），将抛出`NullPointerException`。"
+}

@@ -1,0 +1,12 @@
+{
+  "analysis": "代码片段中，`newInstance`方法被调用前，通过`Class.forName(clazz)`动态加载类，并通过`ConstructorUtils.getMatchingAccessibleConstructor`获取匹配的构造函数。这些操作确保了类存在且构造函数可访问。代码通过捕获`ClassNotFoundException`、`InstantiationException`、`IllegalAccessException`、`InvocationTargetException`四种异常，将它们包装为`FactoryException`抛出。分析如下：\n1. `IllegalAccessException`：通过`getMatchingAccessibleConstructor`确保构造函数可访问，因此此异常被避免。\n2. `IllegalArgumentException`：代码未验证参数`parent`和`path`是否与构造函数签名匹配，因此此异常未被避免。\n3. `InstantiationException`：代码未检查类是否为抽象类，因此此异常未被避免。\n4. `InvocationTargetException`：代码未捕获底层构造函数可能抛出的异常，因此此异常未被避免。\n5. `ExceptionInInitializerError`：代码未显式处理类初始化失败的情况，因此此异常未被避免。",
+  "answer": {
+    "IllegalAccessException": true,
+    "IllegalArgumentException": false,
+    "InstantiationException": false,
+    "InvocationTargetException": false,
+    "ExceptionInInitializerError": false
+  },
+  "result": ["IllegalArgumentException", "InstantiationException", "InvocationTargetException", "ExceptionInInitializerError"],
+  "remark": "未避免的异常触发场景如下：\n1. `IllegalArgumentException`：当`parent`或`path`的类型与构造函数参数不匹配时。\n2. `InstantiationException`：当`clazz`指定的类是抽象类时。\n3. `InvocationTargetException`：当底层构造函数抛出异常时。\n4. `ExceptionInInitializerError`：当类初始化失败（例如静态代码块抛出异常）时。"
+}

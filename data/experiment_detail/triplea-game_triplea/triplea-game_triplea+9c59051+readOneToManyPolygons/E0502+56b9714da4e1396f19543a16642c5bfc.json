@@ -1,0 +1,6 @@
+{
+  "analysis": "代码中调用了`line.substring(0, line.indexOf('<'))`，根据`substring`方法的文档，它可能抛出`IndexOutOfBoundsException`异常，其抛出条件包括：1. `beginIndex`为负；2. `endIndex`大于字符串长度；3. `beginIndex`大于`endIndex`。在代码中，`beginIndex`为0，因此不会为负。`endIndex`由`line.indexOf('<')`提供，如果`line`中不存在字符`'<'`，`indexOf`将返回-1，这将导致`endIndex`为-1，从而触发异常。此外，如果`line`为空字符串或不包含`'<'`，`beginIndex`（0）将大于`endIndex`（-1），同样触发异常。综上，代码未对`line.indexOf('<')`的返回值进行检查，因此未避免`IndexOutOfBoundsException`异常。",
+  "answer": "代码中未避免`IndexOutOfBoundsException`异常的抛出条件。",
+  "result": ["IndexOutOfBoundsException"],
+  "remark": "在代码中，如果输入字符串`line`为空或不包含字符`'<'`，`line.indexOf('<')`将返回-1，导致`substring`方法的`endIndex`为负，从而触发`IndexOutOfBoundsException`异常。建议在调用`substring`之前，先检查`line.indexOf('<')`的返回值是否为-1，并采取适当的处理措施。"
+}

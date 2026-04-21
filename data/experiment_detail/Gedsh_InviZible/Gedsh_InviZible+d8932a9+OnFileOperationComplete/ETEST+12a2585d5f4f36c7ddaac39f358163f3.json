@@ -1,0 +1,8 @@
+{
+  "analysis": "在代码片段中，`substring`方法被调用了两次：\n1. `line.substring(0, line.indexOf(\"=\"))`：这里从字符串开头截取到第一个`=`的位置。\n2. `line.substring(line.indexOf(\"=\") + 1)`：这里从第一个`=`的下一个位置截取到字符串末尾。\n\n根据`substring`方法的文档，它会抛出`IndexOutOfBoundsException`当：\n- `beginIndex`为负数\n- `endIndex`大于字符串长度\n- `beginIndex`大于`endIndex`\n\n在代码中，`line.indexOf(\"=\")`返回的是`=`的位置，如果`line`不包含`=`，`indexOf`会返回-1。因此：\n1. 对于`line.substring(0, line.indexOf(\"=\"))`，当`line`不包含`=`时，`beginIndex=0`，`endIndex=-1`，会抛出`IndexOutOfBoundsException`，因为`beginIndex > endIndex`。\n2. 对于`line.substring(line.indexOf(\"=\") + 1)`，当`line`不包含`=`时，`beginIndex=0`（因为-1 + 1 = 0），如果`line`为空字符串，会抛出`IndexOutOfBoundsException`，因为`beginIndex`等于字符串长度（0）。\n\n然而，代码中有一个前置条件检查：`if (line.contains(\"=\"))`，这意味着只有当`line`包含`=`时，才会执行`substring`操作。因此，`line.indexOf(\"=\")`不会返回-1，从而避免了`IndexOutOfBoundsException`。",
+  "answer": {
+    "IndexOutOfBoundsException": "被避免了，因为代码通过`line.contains(\"=\")`检查确保`line`包含`=`，从而保证`line.indexOf(\"=\")`不会返回-1，避免了`beginIndex`为负数或`beginIndex > endIndex`的情况。"
+  },
+  "result": [],
+  "remark": "在代码片段中，`substring`方法的所有潜在`IndexOutOfBoundsException`异常都被`line.contains(\"=\")`检查避免了。因此，最终结果中没有未被避免的异常类型。"
+}

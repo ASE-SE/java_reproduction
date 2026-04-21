@@ -1,0 +1,9 @@
+{
+  "analysis": "代码片段中调用了`matcher.group(1)`方法。根据API文档，该方法可能抛出两种异常：`IllegalStateException`和`IndexOutOfBoundsException`。\n\n1. `IllegalStateException`：当没有尝试匹配或前一次匹配操作失败时抛出。在代码中，`matcher.find()`方法在`while`循环中被调用，确保在调用`group(1)`之前已经进行了成功的匹配操作，因此`IllegalStateException`被避免了。\n\n2. `IndexOutOfBoundsException`：当给定的组索引在模式中没有对应的捕获组时抛出。代码中使用了固定的组索引1（`group(1)`），但没有检查模式中是否存在至少一个捕获组。因此，如果模式中没有定义捕获组，就会抛出`IndexOutOfBoundsException`。",
+  "answer": {
+    "IllegalStateException": "被避免",
+    "IndexOutOfBoundsException": "未被避免"
+  },
+  "result": ["IndexOutOfBoundsException"],
+  "remark": "在代码片段中，如果正则表达式模式`p`没有定义任何捕获组（即没有使用括号`()`分组），那么调用`matcher.group(1)`就会触发`IndexOutOfBoundsException`。例如，如果`p`的模式是简单的字符串匹配（如`\\$\\{.*?\\}`而没有分组），则调用`group(1)`会抛出异常。"
+}

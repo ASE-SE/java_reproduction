@@ -1,0 +1,11 @@
+{
+  "analysis": "代码片段中调用了`getSeenPlanes().add(plane.getName())`，其中`add`方法的文档表明它可能会抛出四种异常：UnsupportedOperationException、ClassCastException、NullPointerException、IllegalArgumentException。逐一分析这些异常的触发条件和代码上下文：1. `UnsupportedOperationException`：此异常会在`add`操作不被支持时抛出。代码中未检查`getSeenPlanes()`返回的列表是否支持`add`操作，因此此异常未被避免。2. `ClassCastException`：此异常会在元素类型不兼容时抛出。代码中`plane.getName()`返回值类型未明确，但假设其返回值类型与列表兼容，因此此异常被避免。3. `NullPointerException`：此异常会在元素为`null`且列表不允许`null`元素时抛出。代码中通过`if (plane != null)`检查了`plane`是否为`null`，但未检查`plane.getName()`是否可能返回`null`，因此此异常未被避免。4. `IllegalArgumentException`：此异常会在元素的某些属性阻止其被添加时抛出。代码中未对`plane.getName()`的返回值进行任何属性验证，因此此异常未被避免。",
+  "answer": {
+    "UnsupportedOperationException": "未被避免",
+    "ClassCastException": "被避免",
+    "NullPointerException": "未被避免",
+    "IllegalArgumentException": "未被避免"
+  },
+  "result": ["UnsupportedOperationException", "NullPointerException", "IllegalArgumentException"],
+  "remark": "代码片段中未避免的异常包括：1. `UnsupportedOperationException`：如果`getSeenPlanes()`返回的列表不支持`add`操作，则会触发此异常；2. `NullPointerException`：如果`plane.getName()`返回`null`且列表不允许`null`元素，则会触发此异常；3. `IllegalArgumentException`：如果`plane.getName()`的返回值具有某些阻止其被添加到列表的属性，则会触发此异常。建议在调用`add`方法前，增加对列表支持性、元素非空性及合法性的检查。"
+}

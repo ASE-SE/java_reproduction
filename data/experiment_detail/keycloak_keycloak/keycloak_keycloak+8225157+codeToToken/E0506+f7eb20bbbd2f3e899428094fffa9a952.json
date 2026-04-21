@@ -1,0 +1,8 @@
+{
+  "analysis": "<分析过程>\n1. 代码上下文分析：\n   - 代码片段中调用了`String.substring(0, pos)`方法，用于从查询参数中提取参数名。\n   - 调用前通过`param.indexOf('=')`获取等号位置`pos`，然后直接使用`substring(0, pos)`。\n\n2. `substring`方法异常分析：\n   - 根据API文档，`substring`可能抛出`IndexOutOfBoundsException`，当：\n     a) `beginIndex`为负数\n     b) `endIndex`大于字符串长度\n     c) `beginIndex > endIndex`\n\n3. 异常避免检查：\n   - `pos`来自`param.indexOf('=')`，若未找到等号则返回-1\n   - 当`pos == -1`时：\n     - `substring(0, -1)`会抛出`IndexOutOfBoundsException`（条件a）\n   - 代码未对`pos == -1`的情况做特殊处理\n   - 只有当`pos >= 0`时才进入if块，但else分支中直接比较`param.equals(replacedName)`，未处理`pos == -1`的情况\n\n4. 结论：\n   - `IndexOutOfBoundsException`未被完全避免，当参数中不包含等号时会发生\n   - 其他异常类型（如文档中的其他情况）未被明确处理，但当前上下文主要风险是`pos == -1`的情况",
+  "answer": "对于声明的`IndexOutOfBoundsException`异常：\n1. 当`beginIndex`为负数的情况：未被避免（当`param`不包含'='时`pos=-1`会触发）\n2. 当`endIndex`大于字符串长度：被避免（通过`pos=param.indexOf('=')`保证`pos`不超过字符串长度）\n3. 当`beginIndex > endIndex`：被避免（`pos`来自`indexOf`结果，不会出现此情况）",
+  "result": [
+    "IndexOutOfBoundsException"
+  ],
+  "remark": "在代码中，当处理类似\"paramWithoutEquals\"这样的查询参数时（不包含'='字符），`param.indexOf('=')`会返回-1，此时`substring(0, -1)`会抛出`IndexOutOfBoundsException`。这是代码中唯一未被避免的异常场景。"
+}

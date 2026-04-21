@@ -1,0 +1,8 @@
+[
+{
+  "analysis": "分析代码片段，该方法`fitImageToView()`是一个私有方法，主要功能是根据不同的缩放类型(`mScaleType`)调整图像以适应视图。在`switch`语句中，当`mScaleType`为`FIT_START`或`FIT_END`时（即`default`分支），会抛出`UnsupportedOperationException`。由于`FIT_START`和`FIT_END`是`ImageView.ScaleType`的合法枚举值，但该方法不支持这些类型，因此抛出异常。\n\n运行时异常（如`UnsupportedOperationException`）通常表示程序逻辑错误或API使用不当，调用者通常不需要（也不期望）捕获这类异常，因为它们反映了代码中的错误条件，而非可恢复的运行时问题。此处抛出异常的意图是明确告知调用者：如果传入了不支持的`ScaleType`（`FIT_START`或`FIT_END`），则属于编程错误，应修正调用代码而非捕获异常。\n\n此外，该方法为私有方法，异常的抛出范围受限于类内部。若类外部调用该方法，通常是通过公共API间接调用，此时异常会向上传播，但设计上仍不期望捕获。",
+  "answer": "程序员抛出此运行时异常的意图是表明`FIT_START`和`FIT_END`是**不支持的输入**，属于调用者的编程错误。因此，**不期望调用者捕获此异常**，而应修正代码以避免传入非法参数。",
+  "result": "no catch",
+  "remark": "异常抛出的场景是当`mScaleType`为`FIT_START`或`FIT_END`时，这两种类型是`TouchImageView`明确不支持的。抛出`UnsupportedOperationException`是一种防御性编程手段，用于快速失败（fail-fast）并暴露API误用问题，而非要求调用者处理可恢复的运行时错误。"
+}
+]

@@ -1,0 +1,8 @@
+[
+{
+  "analysis": "该方法`extractMediaDescriptions`旨在从`SessionDescription`中提取`MediaDescription`对象，并返回一个非空的`Vector`。方法首先尝试调用`sessionDescription.getMediaDescriptions(false)`来获取媒体描述列表。如果此调用抛出`SdpException`，异常被捕获但未处理，导致`remoteDescriptions`可能为`null`。随后，方法检查`remoteDescriptions`是否为`null`或空，如果是，则抛出`IllegalArgumentException`。根据方法注释，`@throws`明确说明当`sessionDescription`中没有媒体描述时会抛出此异常。这表明该异常用于指示调用者传入的参数不满足方法的前提条件（即`sessionDescription`必须包含至少一个媒体描述）。",
+  "answer": "程序员抛出`IllegalArgumentException`的意图是通知调用者传入的参数无效（无媒体描述），这是一种典型的参数验证异常。通常，这类运行时异常不强制要求调用者捕获，而是期望调用者在调用方法前确保参数有效。因此，程序员可能不希望调用者捕获此异常，而是希望通过异常终止程序或由上层统一处理。",
+  "result": "no catch",
+  "remark": "该异常的抛出场景是当输入的`sessionDescription`不包含任何媒体描述时，方法无法继续执行其核心逻辑（返回非空`Vector`）。抛出`IllegalArgumentException`是一种防御性编程实践，用于快速失败并明确反馈问题根源。调用者应通过预先检查或文档约定避免触发此异常，而非依赖捕获处理。"
+}
+]

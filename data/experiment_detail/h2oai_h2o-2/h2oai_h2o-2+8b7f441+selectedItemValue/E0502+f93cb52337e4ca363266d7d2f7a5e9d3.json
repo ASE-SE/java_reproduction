@@ -1,0 +1,14 @@
+{
+  "analysis": "代码片段中调用`get`方法的上下文如下：在`blockForPending`方法中，`get`方法被调用以等待并获取`Future`对象的结果。代码通过一个`while`循环不断处理`_pending`数组中的`Future`对象，直到`_pending_cnt`为0时退出。在调用`get`方法之前，代码通过`synchronized`块确保线程安全，并检查`_pending_cnt`是否为0以决定是否继续处理。异常分析如下：1. `CancellationException`：文档指出，如果计算被取消，则会抛出此异常。代码中没有对`Future`是否被取消进行显式检查，因此无法避免该异常。2. `ExecutionException`：文档指出，如果计算过程中抛出异常，则会抛出此异常。代码捕获了该异常并将其包装为运行时异常抛出，因此该异常未被避免。3. `InterruptedException`：文档指出，如果当前线程在等待时被中断，则会抛出此异常。代码捕获了该异常并将其包装为运行时异常抛出，因此该异常未被避免。",
+  "answer": {
+    "CancellationException": "未被避免",
+    "ExecutionException": "未被避免",
+    "InterruptedException": "未被避免"
+  },
+  "result": [
+    "CancellationException",
+    "ExecutionException",
+    "InterruptedException"
+  ],
+  "remark": "在代码片段中，`get`方法可能抛出的三种异常均未被完全避免。`CancellationException`可能在`Future`对象被取消时触发；`ExecutionException`可能在`Future`的计算过程中抛出异常时触发；`InterruptedException`可能在当前线程等待`Future`结果时被中断时触发。这些异常的触发场景与`get`方法的调用直接相关，且代码中并未通过预检查或其它方式避免这些异常的发生。"
+}

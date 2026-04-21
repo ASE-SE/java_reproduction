@@ -1,0 +1,9 @@
+{
+  "analysis": "代码片段中调用了`lock.wait()`方法，此方法的文档指出它可能抛出两种异常：`IllegalMonitorStateException`和`InterruptedException`。对于`IllegalMonitorStateException`，抛出条件是当前线程不是对象监视器的所有者，而代码中`wait`调用被包裹在`synchronized (lock)`块中，这确保了当前线程在调用`wait`时拥有`lock`的监视器，因此该异常被避免。对于`InterruptedException`，抛出条件是当前线程在等待通知时被其他线程中断，而代码中`decode`方法的签名声明了`throws InterruptedException`，表明该异常未被处理而是向上传播，因此该异常未被避免。",
+  "answer": {
+    "IllegalMonitorStateException": "被避免",
+    "InterruptedException": "未被避免"
+  },
+  "result": ["InterruptedException"],
+  "remark": "在代码片段中，`InterruptedException`未被处理，而是在方法签名中声明抛出。这表明，如果线程在等待`lock.wait()`时被中断，异常将向上传递给调用者，而不是在当前方法中捕获或处理。因此，`InterruptedException`是唯一未被避免的异常类型。"
+}

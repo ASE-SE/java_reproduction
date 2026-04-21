@@ -1,0 +1,8 @@
+[
+{
+  "analysis": "分析过程：\n1. 方法功能：`ensureOnEventDispatchThread` 是一个静态工具方法，用于验证当前线程是否为 Swing 的事件分发线程（Event Dispatch Thread, EDT）。\n2. 异常抛出条件：当 `SwingUtilities.isEventDispatchThread()` 返回 `false` 时，抛出 `IllegalStateException`。\n3. 设计意图：该方法是一个前置条件检查，确保后续 Swing 操作在正确的线程上执行。抛出异常是为了强制调用者遵守线程规则。\n4. 异常类型：`IllegalStateException` 是运行时异常（unchecked exception），通常表示调用者违反了方法的前提条件。\n5. 上下文推断：Swing 的 EDT 规则是必须遵守的，违反此规则会导致 UI 线程问题。因此，该方法的设计意图是让调用者在调用前确保线程正确性，而不是通过捕获异常来处理。\n",
+  "answer": "问题答案：\n程序员抛出此运行时异常的意图是表明调用者违反了方法的前提条件（必须在 EDT 线程上调用）。由于这是一个不可恢复的编程错误，通常**不期望**调用者捕获此异常，而是应该在调用前通过逻辑确保线程正确性。",
+  "result": "no catch",
+  "remark": "额外评注：\n此异常的抛出场景是调用者未在 Swing 的事件分发线程上调用了依赖 EDT 的方法。这是一种编程错误，类似于 `NullPointerException`，通常应通过代码逻辑（如 `SwingUtilities.invokeLater`）避免，而非捕获处理。捕获此异常可能掩盖根本的线程问题，导致难以调试的 UI 行为。"
+}
+]

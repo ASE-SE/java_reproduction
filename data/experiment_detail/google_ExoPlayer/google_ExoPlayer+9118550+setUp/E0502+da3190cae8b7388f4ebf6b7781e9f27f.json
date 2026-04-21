@@ -1,0 +1,17 @@
+{
+  "analysis": "代码片段中调用了`decoderInfos.remove(0)`，这是一个对`List`接口的`remove`方法的调用。根据`remove`方法的文档，它可能抛出两种异常：`UnsupportedOperationException`和`IndexOutOfBoundsException`。以下是对这两种异常是否被避免的分析：\n\n1. `UnsupportedOperationException`：此异常在`remove`操作不被列表实现支持时抛出。代码中没有检查`decoderInfos`是否支持`remove`操作。因此，这种异常没有被避免。\n\n2. `IndexOutOfBoundsException`：此异常在索引超出范围时抛出（即`index < 0 || index >= size()`）。代码中调用`remove(0)`前，通过`decoderInfos.size() > 1`的判断确保了列表中至少有一个元素，因此`index=0`始终有效。这种异常被避免了。",
+  "answer": [
+    {
+      "exception": "UnsupportedOperationException",
+      "avoided": false
+    },
+    {
+      "exception": "IndexOutOfBoundsException",
+      "avoided": true
+    }
+  ],
+  "result": [
+    "UnsupportedOperationException"
+  ],
+  "remark": "在代码片段中，`UnsupportedOperationException`可能被触发的场景是当`decoderInfos`的实现类不支持`remove`操作时。例如，如果`decoderInfos`是一个不可修改的列表（如通过`Collections.unmodifiableList`创建的列表），调用`remove`方法将抛出此异常。而`IndexOutOfBoundsException`已被通过`decoderInfos.size() > 1`的检查完全避免。"
+}

@@ -1,0 +1,11 @@
+{
+  "analysis": "代码片段中的`getName`方法通过`lastIndexOf`方法获取路径中最后一个'/'的位置，然后根据该位置是否大于0来决定调用`substring`方法的起始索引。当`index > 0`时，调用`abs.substring(index + 1)`；否则调用`abs.substring(1)`。根据`substring`方法的文档，可能抛出的异常是`IndexOutOfBoundsException`，当`beginIndex`为负数或大于字符串长度时触发。在代码中，`index`是`lastIndexOf`的结果，最小为-1（未找到），最大为字符串长度减1。`abs.substring(index + 1)`中，`index + 1`最小为0（当`index`为-1时），最大为字符串长度（当`index`为字符串长度减1时）。`abs.substring(1)`中，`1`必须小于等于字符串长度，否则会抛出异常。",
+  "answer": {
+    "IndexOutOfBoundsException": {
+      "抛出条件": "当`beginIndex`为负数或大于字符串长度时",
+      "是否被避免": "部分避免。当`index`为-1时，`index + 1`为0，不会抛出异常；但当`abs`为空字符串时，`abs.substring(1)`会抛出`IndexOutOfBoundsException`。"
+    }
+  },
+  "result": ["IndexOutOfBoundsException"],
+  "remark": "在代码片段中，当`abs`为空字符串且`index`不大于0时，会调用`abs.substring(1)`，此时由于字符串长度为0，`beginIndex`为1大于字符串长度，会触发`IndexOutOfBoundsException`。这种情况未被避免。"
+}

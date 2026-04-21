@@ -1,0 +1,12 @@
+{
+  "analysis": "1. 代码片段分析：\n   - 方法`getFactoryImplPackageName`接收一个`ProtocolProviderFactory`对象，获取其类名，然后截取从开始到最后一个点号之前的部分作为包名。\n   - `className.substring(0, className.lastIndexOf('.'))`是关键调用，其中`beginIndex`是0，`endIndex`是`className.lastIndexOf('.')`。\n\n2. 异常类型和抛出条件分析：\n   - `IndexOutOfBoundsException`可能由以下条件触发：\n     - `beginIndex`为负数：代码中`beginIndex`固定为0，不会为负。\n     - `endIndex`大于字符串长度：如果`lastIndexOf('.')`返回-1（即没有找到点号），则`endIndex`为-1，此时`beginIndex`(0) > `endIndex`(-1)，会抛出异常。\n     - `beginIndex`大于`endIndex`：同上，当没有找到点号时触发。\n\n3. 异常避免分析：\n   - 代码没有检查`lastIndexOf('.')`的结果是否为-1，因此无法避免当类名不含点号时抛出的`IndexOutOfBoundsException`。",
+  "answer": {
+    "IndexOutOfBoundsException": {
+      "beginIndex为负数": "已避免",
+      "endIndex大于字符串长度": "未避免",
+      "beginIndex大于endIndex": "未避免"
+    }
+  },
+  "result": ["IndexOutOfBoundsException"],
+  "remark": "当输入的`factory`对象的类名不含点号（如顶级类或无包类）时，`lastIndexOf('.')`返回-1，导致`substring(0, -1)`调用，触发`IndexOutOfBoundsException`。代码未对此场景做防护。"
+}

@@ -1,0 +1,9 @@
+{
+  "analysis": "代码片段中，`getProperty` 方法首先调用 `getCustom` 获取一个 `Map` 对象 `overrides`，然后通过 `overrides.containsKey(key)` 检查是否存在指定的键，避免了直接调用 `get` 方法可能引发的异常。如果 `overrides` 中包含指定键，则返回对应的值；否则，调用 `protocol.getProperties().get(key)` 获取值。根据 `get` 方法的文档，它可能抛出两种异常：`ClassCastException` 和 `NullPointerException`。`ClassCastException` 的抛出条件是键的类型不适用于该 `Map`，而 `NullPointerException` 的抛出条件是键为 `null` 且该 `Map` 不允许 `null` 键。在代码中，`containsKey` 方法的调用确保了键的类型和 `null` 值在 `overrides` 中不会引发异常，但对于 `protocol.getProperties().get(key)`，没有类似的检查，因此可能抛出这两种异常。",
+  "answer": {
+    "ClassCastException": "未被避免，因为未对 `protocol.getProperties()` 的键类型进行检查。",
+    "NullPointerException": "未被避免，因为未对 `protocol.getProperties()` 的键是否为 `null` 进行检查。"
+  },
+  "result": ["ClassCastException", "NullPointerException"],
+  "remark": "在代码片段中，`protocol.getProperties().get(key)` 的调用没有对键的类型和是否为 `null` 进行检查，因此在以下场景中可能触发异常：1. 如果 `key` 的类型与 `protocol.getProperties()` 的键类型不兼容，则会抛出 `ClassCastException`；2. 如果 `key` 为 `null` 且 `protocol.getProperties()` 不允许 `null` 键，则会抛出 `NullPointerException`。"
+}

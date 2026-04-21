@@ -1,0 +1,9 @@
+{
+  "analysis": "1. 代码片段分析：该方法用于获取文件名的扩展名。它通过查找最后一个'.'的位置，并取该位置之后的子字符串来实现。\n2. 异常类型分析：根据API文档，substring方法可能抛出IndexOutOfBoundsException异常，当beginIndex为负数或大于字符串长度时。\n3. 异常避免分析：\n   - 当filename为null时，会抛出NullPointerException，但这不是substring方法的异常，且代码中没有检查null。\n   - 当filename中不包含'.'时，lastIndexOf返回-1，beginIndex为0，不会抛出异常。\n   - 当filename以'.'结尾时，beginIndex等于字符串长度，substring方法允许这种情况（返回空字符串）。\n   - 当filename为空字符串时，lastIndexOf返回-1，beginIndex为0，但字符串长度为0，会抛出IndexOutOfBoundsException。",
+  "answer": {
+    "IndexOutOfBoundsException": "部分避免（当filename为空字符串时未避免）",
+    "NullPointerException": "未避免"
+  },
+  "result": ["IndexOutOfBoundsException", "NullPointerException"],
+  "remark": "1. IndexOutOfBoundsException会在filename为空字符串时触发，因为此时lastIndexOf('.')返回-1，+1后为0，但对空字符串调用substring(0)会抛出异常。\n2. NullPointerException会在filename为null时触发，因为代码中没有对null进行检查，直接调用lastIndexOf方法。"
+}

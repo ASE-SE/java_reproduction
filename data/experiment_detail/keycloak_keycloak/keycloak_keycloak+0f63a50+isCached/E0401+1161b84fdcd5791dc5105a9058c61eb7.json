@@ -1,0 +1,11 @@
+{
+  "analysis": "1. 代码片段分析：\n   - 代码调用链：token.getIssuer().lastIndexOf('/') → substring()\n   - 关键点：substring()的beginIndex参数由lastIndexOf('/')+1决定\n\n2. 异常分析（IndexOutOfBoundsException）：\n   - 抛出条件1：beginIndex为负数 → 当lastIndexOf()返回-1时，beginIndex=0\n   - 抛出条件2：beginIndex > 字符串长度 → 当lastIndexOf()返回的位置是字符串末尾时（如'abc/'），beginIndex=length+1\n\n3. 避免情况：\n   - 负数情况：当字符串不含'/'时，lastIndexOf()返回-1，但+1后变为0（合法）\n   - 越界情况：当'/'是最后一个字符时，beginIndex=length+1（未处理）",
+  "answer": {
+    "IndexOutOfBoundsException": {
+      "negative_beginIndex": "已避免（通过+1自动修正）",
+      "exceed_length_beginIndex": "未避免（未检查lastIndexOf()是否在末尾）"
+    }
+  },
+  "result": ["IndexOutOfBoundsException"],
+  "remark": "触发场景示例：当token.getIssuer()返回类似'http://example.com/'的字符串时，lastIndexOf('/')返回字符串末尾位置，beginIndex=length+1导致异常。建议增加空字符串检查或处理末尾'/'的情况。"
+}

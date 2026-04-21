@@ -1,0 +1,11 @@
+{
+  "analysis": "1. 代码片段中调用`put`方法前对`name`和`value`进行了处理：\n   - 检查`name`是否为null，如果是则直接返回\n   - 检查`value`是否为null，如果是则赋值为空字符串\n   - 检查`name`是否包含XML实体，如果是则抛出`IllegalArgumentException`\n2. 分析`put`方法可能抛出的异常：\n   - `UnsupportedOperationException`：未检查，但`propertyCache`的类型未知\n   - `ClassCastException`：通过前置检查避免了\n   - `NullPointerException`：通过前置检查避免了\n   - `IllegalArgumentException`：部分通过前置检查避免了",
+  "answer": {
+    "UnsupportedOperationException": "未被避免",
+    "ClassCastException": "被避免",
+    "NullPointerException": "被避免",
+    "IllegalArgumentException": "部分被避免（仅检查了XML实体情况）"
+  },
+  "result": ["UnsupportedOperationException", "IllegalArgumentException"],
+  "remark": "1. `UnsupportedOperationException`未被避免是因为无法确定`propertyCache`是否支持put操作\n2. `IllegalArgumentException`未被完全避免是因为文档中提到的\"some property\"可能包含除XML实体外的其他限制条件\n3. 触发场景：\n   - 如果`propertyCache`是只读Map则会触发`UnsupportedOperationException`\n   - 如果`name`或`value`有其他格式限制（如长度、字符集等）则会触发`IllegalArgumentException`"
+}

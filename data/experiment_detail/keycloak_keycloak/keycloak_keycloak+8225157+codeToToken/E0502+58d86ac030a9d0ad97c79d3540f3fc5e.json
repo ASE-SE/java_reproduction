@@ -1,0 +1,6 @@
+{
+  "analysis": "代码片段中，`substring` 方法在满足 `string != null && string.length() > length` 的条件下被调用。调用时，`beginIndex` 为 0，`endIndex` 为 `length - 1`。根据 `substring` 的文档，它可能抛出 `IndexOutOfBoundsException` 异常，条件包括：`beginIndex` 为负、`endIndex` 大于字符串长度、或 `beginIndex` 大于 `endIndex`。在代码中，`beginIndex` 始终为 0，因此不会为负。`endIndex` 的值为 `length - 1`，但代码中未验证 `length - 1` 是否大于字符串长度，也未验证 `length - 1` 是否为负（即 `length` 为 0 的情况）。因此，`IndexOutOfBoundsException` 的抛出条件未完全避免。",
+  "answer": "抛出条件是否被避免：`beginIndex` 为负：已避免；`endIndex` 大于字符串长度：未避免；`beginIndex` 大于 `endIndex`：未避免。",
+  "result": ["IndexOutOfBoundsException"],
+  "remark": "在代码中，`length - 1` 的值可能导致 `endIndex` 超出字符串长度（当 `length - 1 > string.length()` 时）或为负（当 `length == 0` 时），从而触发 `IndexOutOfBoundsException`。例如，当 `string = \"abc\"` 且 `length = 0` 时，`length - 1` 为负，抛出异常。"
+}

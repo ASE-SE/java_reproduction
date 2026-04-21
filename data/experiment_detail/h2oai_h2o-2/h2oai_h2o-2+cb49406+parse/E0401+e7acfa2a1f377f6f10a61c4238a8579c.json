@@ -1,0 +1,11 @@
+{
+  "analysis": "1. 代码片段分析：\n   - 方法`decodeKeyName`接收一个字符串参数`what`\n   - 首先检查了`what`是否为null或空字符串，这两种情况直接返回null\n   - 然后检查第一个字符是否是`MAGIC_CHAR`，如果是则继续处理\n   - 调用`what.indexOf(MAGIC_CHAR,1)`查找第二个`MAGIC_CHAR`的位置\n   - 使用`what.substring(len + 1)`获取子字符串\n\n2. 异常分析：\n   - `substring`方法可能抛出`IndexOutOfBoundsException`\n   - 抛出条件：beginIndex为负数或大于字符串长度\n   - 代码中`len`来自`indexOf`的结果，可能为-1(未找到)\n   - 当`len`为-1时，`len + 1`为0，此时不会抛出异常\n   - 当`len`为有效索引时，`len + 1`可能超过字符串长度",
+  "answer": {
+    "IndexOutOfBoundsException": {
+      "avoided": false,
+      "reason": "当len是字符串最后一个字符的索引时，len+1等于字符串长度，此时substring调用会抛出异常"
+    }
+  },
+  "result": ["IndexOutOfBoundsException"],
+  "remark": "在代码触发场景中，当输入的字符串what中只有一个MAGIC_CHAR字符(位于开头)时，indexOf会返回-1，此时len+1=0，不会抛出异常。但当what中包含两个MAGIC_CHAR且第二个位于字符串末尾时，len+1将等于字符串长度，此时会触发IndexOutOfBoundsException。"
+}

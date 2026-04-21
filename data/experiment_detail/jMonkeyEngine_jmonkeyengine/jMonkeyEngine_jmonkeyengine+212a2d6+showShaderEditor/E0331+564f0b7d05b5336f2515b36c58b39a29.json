@@ -1,0 +1,11 @@
+{
+  "analysis": "1. 代码片段分析：\n   - 方法`getProcessor`接收一个`Class<T>`参数，尝试从`classToProcMap`中获取对应的实例\n   - 如果实例不存在，则同步创建新实例并存入map\n   - 在创建实例时调用了`procClass.newInstance()`\n\n2. 异常分析(根据api文档)：\n   - IllegalAccessException：当类或其无参构造器不可访问时抛出\n     - 代码中通过try-catch捕获并转换为IllegalArgumentException\n   - InstantiationException：当类是抽象类/接口/数组类/基本类型/void，或没有无参构造器时抛出\n     - 代码中通过try-catch捕获并转换为IllegalArgumentException\n   - ExceptionInInitializerError：当类初始化失败时抛出\n     - 代码中未捕获此异常\n   - SecurityException：当安全管理器限制访问时抛出\n     - 代码中未捕获此异常",
+  "answer": {
+    "IllegalAccessException": "已通过try-catch避免",
+    "InstantiationException": "已通过try-catch避免",
+    "ExceptionInInitializerError": "未被避免",
+    "SecurityException": "未被避免"
+  },
+  "result": ["ExceptionInInitializerError", "SecurityException"],
+  "remark": "未被避免的异常触发场景：\n1. ExceptionInInitializerError：当procClass的静态初始化块或静态变量初始化抛出异常时触发\n2. SecurityException：当存在安全管理器且调用者没有权限访问procClass所在包时触发"
+}

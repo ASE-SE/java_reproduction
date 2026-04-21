@@ -1,0 +1,12 @@
+{
+  "analysis": "1. 代码片段分析：\n   - 方法`getPackageName`接收一个字符串参数`classFullName`，用于获取类的包名\n   - 首先查找最后一个点号的位置`lastDot`\n   - 如果找不到点号(`lastDot < 0`)，返回空字符串\n   - 否则返回从开头到最后一个点号前的子字符串\n\n2. 异常分析：\n   - `substring`方法可能抛出`IndexOutOfBoundsException`异常\n   - 抛出条件：\n     a) `beginIndex`为负数\n     b) `endIndex`大于字符串长度\n     c) `beginIndex`大于`endIndex`\n\n3. 异常避免分析：\n   - 对于条件a)：`lastDot`是`lastIndexOf`的结果，最小值为-1，但`lastDot < 0`时不会调用`substring`，所以避免了\n   - 对于条件b)：`lastDot`最大值为字符串长度-1，而`substring`的`endIndex`参数是`lastDot`，所以不会超过字符串长度\n   - 对于条件c)：`beginIndex`固定为0，`lastDot`最小为0(因为`lastDot < 0`时不会调用)，所以0 <= lastDot",
+  "answer": {
+    "IndexOutOfBoundsException": {
+      "beginIndex is negative": "已避免",
+      "endIndex is larger than the length": "已避免",
+      "beginIndex is larger than endIndex": "已避免"
+    }
+  },
+  "result": [],
+  "remark": "代码中通过合理的条件判断和参数传递，完全避免了所有可能的`IndexOutOfBoundsException`异常情况。具体来说：\n1. 当`lastDot`为负时直接返回空字符串，不调用`substring`\n2. 当调用`substring`时，确保`beginIndex`(0)总是小于等于`endIndex`(lastDot)\n3. `lastDot`作为`lastIndexOf`的结果，最大不会超过字符串长度"
+}

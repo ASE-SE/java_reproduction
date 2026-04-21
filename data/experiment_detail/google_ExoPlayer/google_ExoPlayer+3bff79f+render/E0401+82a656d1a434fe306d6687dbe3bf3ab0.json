@@ -1,0 +1,14 @@
+[
+{
+  "analysis": "The method `onInputFormatChanged` is designed to handle format changes in a media stream, particularly focusing on DRM (Digital Rights Management) session management. The runtime exception is thrown under the condition that a new format requires a DRM session manager (`newFormat.drmInitData != null`), but the current DRM session manager is not initialized (`drmSessionManager == null`). The exception is created with an `IllegalStateException` indicating that the media requires a DRM session manager, which is a critical configuration error. The method's signature explicitly declares that it throws `ExoPlaybackException`, suggesting that the exception is intended to be handled by the caller, especially since the error is related to a misconfiguration that the caller might need to address (e.g., by providing a DRM session manager).",
+  "answer": "The programmer expects the thrown runtime exception to be caught and handled by the caller, as it indicates a critical configuration error that the caller might need to rectify.",
+  "result": "should catch",
+  "remark": "The exception is thrown in a scenario where the media format requires DRM protection, but the necessary DRM session manager is not provided. This is a configuration error that likely requires intervention from the caller to provide the missing DRM session manager or handle the error appropriately (e.g., by logging, notifying the user, or falling back to non-DRM content). The method's declaration of `throws ExoPlaybackException` further supports the expectation that the caller should handle this exception."
+},
+{
+  "analysis": "在代码片段中，`throw new IllegalStateException();`出现在`switch`语句的`default`分支中。这表明当`canKeepCodec`方法的返回值不在预期的`KEEP_CODEC_RESULT_*`枚举范围内时，会抛出`IllegalStateException`。这种异常通常表示程序状态不正确，是一种不可恢复的错误。由于这是一个运行时异常，调用者可以选择捕获它，但通常这种异常表示程序逻辑错误，应该在开发阶段修复，而不是在运行时捕获处理。",
+  "answer": "程序员不希望抛出的这个运行时异常被调用者捕获并处理，因为这是一个表示程序逻辑错误的异常，应该在开发阶段修复。",
+  "result": "no catch",
+  "remark": "`IllegalStateException`在这里表示程序进入了一个不应该出现的状态，即`canKeepCodec`返回了未预期的值。这种异常通常用于指示编程错误，而不是运行时环境或用户输入导致的错误。因此，它通常不应该被捕获，而是应该在开发阶段通过修复代码逻辑来避免。"
+}
+]

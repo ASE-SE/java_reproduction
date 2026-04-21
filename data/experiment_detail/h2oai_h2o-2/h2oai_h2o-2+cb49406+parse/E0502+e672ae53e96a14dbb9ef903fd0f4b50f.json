@@ -1,0 +1,10 @@
+{
+  "analysis": "代码片段中，`blockForPending` 方法通过一个循环不断获取 `_pending` 数组中的 `Future` 对象，并调用其 `get` 方法。在调用 `get` 方法之前，代码通过同步块 (`synchronized`) 确保 `_pending_cnt` 不为 0，以避免数组越界访问。此外，`get` 方法的文档表明它可能抛出三种异常：`CancellationException`、`ExecutionException` 和 `InterruptedException`。代码中对 `InterruptedException` 和 `ExecutionException` 进行了捕获并重新抛出为运行时异常，但未对 `CancellationException` 进行显式处理。因此，`CancellationException` 未被避免，而其他两种异常通过捕获被转换为运行时异常。",
+  "answer": {
+    "CancellationException": "未被避免，因为代码未检查 Future 是否被取消。",
+    "ExecutionException": "被避免，因为捕获后转换为运行时异常。",
+    "InterruptedException": "被避免，因为捕获后转换为运行时异常。"
+  },
+  "result": ["CancellationException"],
+  "remark": "在代码中，`CancellationException` 可能会在 `Future` 被取消时触发，但由于代码未检查 `Future` 的状态（例如通过 `isCancelled` 方法），因此无法避免该异常的发生。其他两种异常虽然被捕获，但它们的触发场景分别是线程中断和任务执行过程中抛出异常，这些场景在代码中未被完全排除。"
+}

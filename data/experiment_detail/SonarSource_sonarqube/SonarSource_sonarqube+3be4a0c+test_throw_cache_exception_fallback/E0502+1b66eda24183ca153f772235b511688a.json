@@ -1,0 +1,6 @@
+{
+  "analysis": "代码片段中调用了`String.format`方法三次，分别在三个`String.format`调用中格式化字符串。根据`format`方法的文档，它可能会抛出`IllegalFormatException`，当且仅当格式字符串包含非法语法、格式说明符与给定参数不兼容、给定参数不足或存在其他非法条件时。在代码中，`String.format`的调用依赖于硬编码的格式字符串和动态参数。第一个调用中，`getMessageWhenNotAuthorized()`返回值作为格式字符串，后跟`CoreProperties.LOGIN`和`CoreProperties.PASSWORD`作为参数。第二个调用中，`tryParseAsJsonError(he.getResponseContent())`返回值作为格式字符串，没有额外参数。第三个调用中，硬编码的格式字符串`\"Fail to execute request [code=%s, url=%s]\"`与`he.getResponseCode()`和`he.getUri()`作为参数。由于`getMessageWhenNotAuthorized()`和`tryParseAsJsonError()`的返回值内容未知，无法确保它们返回的字符串是合法的格式字符串，因此无法完全避免`IllegalFormatException`。第三个调用中，硬编码的格式字符串语法是正确的，参数数量和类型也匹配，因此该调用不会抛出异常。",
+  "answer": "IllegalFormatException 的抛出条件在第一个和第二个 `String.format` 调用中未被完全避免，因为格式字符串的合法性依赖于 `getMessageWhenNotAuthorized()` 和 `tryParseAsJsonError()` 的返回值，而这些值无法从代码片段中确定。第三个 `String.format` 调用中，抛出条件被避免，因为格式字符串和参数是硬编码且匹配的。",
+  "result": ["java.util.IllegalFormatException"],
+  "remark": "未避免的异常 `java.util.IllegalFormatException` 可能由以下场景触发：1) `getMessageWhenNotAuthorized()` 返回的字符串包含非法的格式说明符；2) `tryParseAsJsonError(he.getResponseContent())` 返回的字符串包含非法的格式说明符。如果这些方法返回的字符串不符合格式化规则，`String.format` 调用将抛出异常。"
+}

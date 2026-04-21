@@ -1,0 +1,6 @@
+{
+  "analysis": "代码片段中调用了`substring`方法，并且其参数为`property.indexOf('.') + 1`。根据`substring`方法的文档，它可能抛出`IndexOutOfBoundsException`，其触发条件是`beginIndex`小于0或大于字符串的长度。代码片段中对`substring`的调用前，使用了`property.startsWith(\"%\")`进行条件判断，确保只有在字符串以`%`开头时，才会调用`substring`。此外，`indexOf`方法会返回-1如果没有找到`.`字符，加1后变为0，这可能仍然导致`substring(0)`的调用。然而，如果字符串中确实包含`.`字符，`indexOf`的结果会是一个非负数，加1后是合法的索引值。因此，`IndexOutOfBoundsException`的触发条件部分被避免，但未能完全避免，因为当字符串中不包含`.`时，`substring(0)`可能被调用，而如果字符串为空或长度不足，仍然可能抛出异常。",
+  "answer": "声明的异常`IndexOutOfBoundsException`的抛出条件未被完全避免。",
+  "result": ["IndexOutOfBoundsException"],
+  "remark": "在代码片段中，`IndexOutOfBoundsException`可能在以下场景中触发：当`property`字符串中不包含`.`字符时，`property.indexOf('.')`返回-1，加1后变为0，调用`substring(0)`。如果`property`字符串为空或长度不足，这将导致异常。因此，`IndexOutOfBoundsException`未被完全避免。"
+}

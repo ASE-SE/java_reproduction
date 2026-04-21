@@ -1,0 +1,10 @@
+{
+  "analysis": "代码片段中调用了`System.setProperty`方法，该方法根据文档可能抛出以下异常：`SecurityException`、`NullPointerException`、`IllegalArgumentException`。以下是对这些异常的分析：\n1. `SecurityException`：此异常在存在安全管理器且其`checkPermission`方法不允许设置指定属性时抛出。代码中没有任何检查或逻辑来避免此异常，因此它未被避免。\n2. `NullPointerException`：此异常在`key`或`value`为`null`时抛出。代码中在调用`System.setProperty`之前，检查了`property == null`的情况，并在`property`为`null`时直接返回，因此此异常被避免。\n3. `IllegalArgumentException`：此异常在`key`为空字符串时抛出。代码中没有对`propertyName`是否为空字符串进行检查，因此此异常未被避免。\n综上，`NullPointerException`被避免，而`SecurityException`和`IllegalArgumentException`未被避免。",
+  "answer": {
+    "SecurityException": "未被避免",
+    "NullPointerException": "被避免",
+    "IllegalArgumentException": "未被避免"
+  },
+  "result": ["SecurityException", "IllegalArgumentException"],
+  "remark": "未被避免的异常`SecurityException`可能在设置了安全管理器的环境中触发，而`IllegalArgumentException`可能在`propertyName`为空字符串的情况下触发。代码中对`property`是否为`null`进行了检查，因此避免了`NullPointerException`，但未对其他两种异常的触发条件进行处理。"
+}

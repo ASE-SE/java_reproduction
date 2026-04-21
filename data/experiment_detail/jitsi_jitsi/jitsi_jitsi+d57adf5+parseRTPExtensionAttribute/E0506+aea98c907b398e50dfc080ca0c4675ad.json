@@ -1,0 +1,14 @@
+[
+{
+  "analysis": "<分析过程>\n1. 方法签名中声明了throws IllegalArgumentException，表明这是一个受检异常（checked exception），但IllegalArgumentException实际上是运行时异常（RuntimeException的子类）。\n2. 从Java规范来看，RuntimeException及其子类不需要在方法签名中声明，但这里显式声明了，这可能是为了强调这个异常应该被调用者处理。\n3. 抛出异常的条件有两个：\n   - 当extID已被映射到另一个RTPExtension时\n   - 当extID小于MIN_HEADER_ID时\n4. 这两种情况都是参数验证失败的情况，属于程序错误（而非系统错误或资源错误），通常应该由调用者处理。\n5. 从方法注释看，这个方法主要用于处理传入的媒体描述，调用者应该知道如何处理重复ID或无效ID的情况。\n<分析过程>",
+  "answer": "<问题答案>\n根据代码上下文和异常抛出条件，程序员期望这个运行时异常被调用者捕获并处理。虽然RuntimeException通常不需要强制捕获，但这里显式声明了throws子句，且异常表示的是可恢复的程序错误（参数不合法），因此调用者应该处理这些情况。\n<问题答案>",
+  "result": "<最终结果>\nshould catch\n<最终结果>",
+  "remark": "<额外评注>\n这个异常在两种场景下被抛出：\n1. 当尝试添加一个已被使用的extID时（业务逻辑冲突）\n2. 当extID值无效时（参数验证失败）\n这两种情况都是调用者应该知道的错误情况，特别是第一种情况，调用者可能需要决定是覆盖现有映射还是中止操作。因此异常被设计为需要捕获处理的。\n<额外评注>"
+},
+{
+  "analysis": "<分析过程>\n1. 方法功能分析：该方法`addMapping`用于向注册表添加RTP扩展头ID与扩展对象的映射关系，主要用于处理传入的媒体描述。\n2. 异常抛出条件：代码中抛出`IllegalArgumentException`的条件有两个：\n   - 当`extID`已被其他`RTPExtension`占用时（通过`findExtension`检查）\n   - 当`extID`小于`MIN_HEADER_ID`时（有效性检查）\n3. 异常类型选择：使用`IllegalArgumentException`（非受检异常）表明这是参数不合法导致的编程错误，通常应在开发阶段被捕获。\n4. 方法声明：方法签名中显式声明了`throws IllegalArgumentException`，这表示作者预期调用者可能需要处理此异常。\n5. 上下文判断：参数有效性检查（extID范围）是方法的核心契约，违反此契约会导致方法无法正常工作，因此需要强制调用者处理。\n<分析过程>",
+  "answer": "<问题答案>\n根据代码上下文和异常抛出条件，程序员明确期望这个运行时异常被调用者捕获并处理。因为：\n1. 方法签名显式声明了`throws`子句\n2. 参数有效性检查是方法的核心前提条件\n3. 异常消息提供了详细的错误定位信息（extID值和有效范围）\n4. 这类参数验证失败通常属于调用者的责任范围\n<问题答案>",
+  "result": "<最终结果>\nshould catch\n<最终结果>",
+  "remark": "<额外评注>\n该异常在以下场景抛出：\n当传入的extID参数小于允许的最小头ID值（MIN_HEADER_ID）时，会抛出此异常。异常消息明确指出了：\n1. 无效的extID具体值\n2. 必须满足的范围要求（MIN_HEADER_ID到MAX_TWO_BYTE_HEADER_ID）\n这种设计模式符合Java最佳实践：对关键参数进行防御性验证，并通过异常强制调用者遵守方法契约。\n<额外评注>"
+}
+]

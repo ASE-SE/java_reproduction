@@ -1,0 +1,11 @@
+{
+  "analysis": "1. 代码片段分析：\n   - 方法`getMapper`接收一个字符串参数`property`\n   - 当`property`以'%'开头时，会调用`property.substring(property.indexOf('.') + 1)`\n   - 否则直接使用`property`作为key从`MAPPERS`获取值\n\n2. 异常分析：\n   - `substring`方法可能抛出`IndexOutOfBoundsException`\n   - 抛出条件：\n     * `beginIndex`为负数\n     * `beginIndex`大于字符串长度\n\n3. 异常避免检查：\n   - 代码中没有对`property.indexOf('.')`的结果进行检查\n   - 如果字符串中不存在'.'字符，`indexOf`返回-1，此时`beginIndex`为0（-1+1）\n   - 如果字符串为空或以'%'开头但不包含'.'，可能导致异常",
+  "answer": {
+    "IndexOutOfBoundsException": {
+      "avoided": false,
+      "reason": "代码没有检查property中是否包含'.'字符，当不存在时indexOf返回-1，虽然+1后为0不会直接导致异常，但如果字符串为空或以'%'开头但不包含'.'，可能导致其他边界条件问题"
+    }
+  },
+  "result": ["IndexOutOfBoundsException"],
+  "remark": "在以下场景可能触发异常：\n1. 当property为空字符串且以'%'开头时，调用substring(0)虽然不会直接抛出异常，但后续操作可能有风险\n2. 当property以'%'开头但不包含'.'时，indexOf返回-1，+1后为0，虽然不会直接导致IndexOutOfBoundsException，但如果字符串长度不足可能在其他地方引发问题\n3. 更完整的异常避免应该检查字符串是否包含'.'以及子字符串操作是否安全"
+}

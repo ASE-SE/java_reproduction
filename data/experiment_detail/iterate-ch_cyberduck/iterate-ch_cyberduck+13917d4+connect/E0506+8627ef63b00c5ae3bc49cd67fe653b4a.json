@@ -1,0 +1,8 @@
+[
+{
+  "analysis": "<分析过程>\n1. 方法功能分析：该方法名为getProperty，用于从defaults表中查询指定property对应的值。若未找到，则抛出IllegalArgumentException。\n2. 异常抛出条件：当defaults.get(property)返回null时，表示未找到对应property，此时会抛出异常。\n3. 异常类型选择：IllegalArgumentException是运行时异常(RuntimeException)，这意味着它不需要在方法签名中声明，调用者可以选择是否捕获。\n4. 方法注释提示：方法注释提到\"Should be overriden by the implementation\"，暗示这是一个基类/默认实现，子类可能需要覆盖。同时说明\"only called if the property can't be found in the users's defaults table\"，表明这是最后的查找手段。\n5. 设计意图推测：抛出运行时异常而非检查型异常，说明设计者认为property不存在是编程错误(如拼写错误)，而非正常业务逻辑流程。这种情况下，通常希望失败快(fail fast)而非被捕获处理。\n6. 返回值矛盾：方法声明返回String，但在异常情况下不会返回任何值，这进一步强化了异常是预期错误处理方式的观点。\n",
+  "answer": "<问题答案>\n根据代码上下文和设计模式，程序员抛出这个运行时异常的意图是表明：当调用此方法时，预期property应该存在于defaults表中。如果不存在，说明调用方有错误(如传入了无效的property)，这种情况下应该让异常传播出去，而不是被捕获处理。因此，程序员不期望这个异常被调用者常规性地捕获处理。\n",
+  "result": "<最终结果>\nno catch\n",
+  "remark": "<额外评注>\n这个异常表示调用者传入了无效的property参数，属于API使用错误。在面向对象设计中，当方法无法完成其契约时抛出异常是合理的。由于这是运行时异常，框架设计者可能期望：1) 调用前进行参数校验 2) 在更高层次有统一的错误处理机制 3) 测试时暴露参数错误。捕获这个异常可能掩盖真正的编程错误，因此通常不需要也不建议在调用处捕获。\n"
+}
+]

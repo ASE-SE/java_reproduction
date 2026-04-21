@@ -1,0 +1,196 @@
+package org.ASTAnalyzer;
+import org.eclipse.jdt.core.dom.*;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class Util {
+    private static ASTParser astParser;
+
+    static {
+        astParser = ASTParser.newParser(AST.JLS21);
+        astParser.setKind(ASTParser.K_COMPILATION_UNIT);
+    }
+
+    public static CompilationUnit getMethodCompilationUnit(String methodContent) throws IllegalStateException{
+        astParser.setSource(methodContent.toCharArray());
+        return (CompilationUnit) (astParser.createAST(null));
+    }
+
+    public static CompilationUnit getCompilationUnit(String javaFilePath){
+        byte[] input = null;
+        try {
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(javaFilePath));
+            input = new byte[bufferedInputStream.available()];
+            bufferedInputStream.read(input);
+            bufferedInputStream.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        astParser.setSource(new String(input).toCharArray());
+
+        return (CompilationUnit) (astParser.createAST(null));
+    }
+
+    public static String generateMethodName(MethodDeclaration node){
+        StringBuilder sb = new StringBuilder();
+        sb.append(node.getName().toString());
+        sb.append("(");
+        List<SingleVariableDeclaration> parameters = node.parameters();
+        for (SingleVariableDeclaration parameter : parameters) {
+            sb.append(parameter.getType().toString());
+            sb.append(",");
+        }
+        sb.append(")");
+        return sb.toString().replace(",)", ")");
+    }
+
+    private static final Pattern declarationAssignmentPattern = Pattern.compile("^[\\s\t]*(\\w+)\\s+(\\w+)\\s*=\\s*.*;\\s*$");
+    private static final Pattern tryWithResourcePattern = Pattern.compile("^[\\s\t]*try\\s*\\((.*)\\)\\s*\\{\\s*$");
+    public static boolean isLineMatch(String oldLine, String newLine) {
+        Matcher declarationAssignmentMatcher = declarationAssignmentPattern.matcher(oldLine);
+        Matcher tryWithResourceMatcher = tryWithResourcePattern.matcher(newLine);
+        if (declarationAssignmentMatcher.matches()) {
+            String withoutType = oldLine.replaceAll((declarationAssignmentMatcher.group(1) + " "), "");
+            return (isLineMatchWithoutIndentation(oldLine, newLine)
+                    || isLineMatchWithoutIndentation(withoutType, newLine)
+                    || isLineMatch(withoutType, newLine));
+        } else if (tryWithResourceMatcher.matches()) {
+            String resourceAssignment = tryWithResourceMatcher.group(1);
+            return (isLineMatchWithoutIndentation(oldLine, newLine)
+                    || isLineMatchWithoutIndentation(oldLine, resourceAssignment)
+                    || isLineMatch(oldLine, resourceAssignment));
+        }
+        return isLineMatchWithoutIndentation(oldLine, newLine);
+    }
+
+    public static boolean isLineMatchWithoutIndentation(String l1, String l2){
+        // 为括号两端添加空格，后去除开头和结尾的空格和制表符，将中间的不定长空格改为1空格，后比较是否相等
+        String trimmedStr1 = l1
+                .replaceAll("\\(", " ( ")
+                .replaceAll("\\)", " ) ")
+                .replaceAll("\\[", " [ ")
+                .replaceAll("]", " ] ")
+                .replaceAll("\\{", " { ")
+                .replaceAll("}", " } ")
+                .replaceAll(";", " ; ")
+                .replaceAll("^[\\s\t]+", "")
+                .replaceAll("[\\s\t]+$", "")
+                .replaceAll("\\s{2,}", " ");
+        String trimmedStr2 = l2
+                .replaceAll("\\(", " ( ")
+                .replaceAll("\\)", " ) ")
+                .replaceAll("\\[", " [ ")
+                .replaceAll("]", " ] ")
+                .replaceAll("\\{", " { ")
+                .replaceAll("}", " } ")
+                .replaceAll(";", " ; ")
+                .replaceAll("^[\\s\t]+", "")
+                .replaceAll("[\\s\t]+$", "")
+                .replaceAll("\\s{2,}", " ");
+
+        return trimmedStr1.equals(trimmedStr2);
+    }
+
+    public static List<String> splitStringByNewline(String input) {
+        // 使用换行符分割字符串，并将结果转换为列表
+        return Arrays.asList(input.split("\\n"));
+    }
+
+    public static List<String> diffLines(String[] lines1, String[] lines2) {
+
+        int[][] d = new int[lines1.length + 1][lines2.length + 1];
+
+        for (int i = 0; i <= lines1.length; i++) {
+            d[i][0] = i; // 删除操作
+        }
+        for (int j = 0; j <= lines2.length; j++) {
+            d[0][j] = j; // 插入操作
+        }
+
+        for (int i = 1; i <= lines1.length; i++) {
+            for (int j = 1; j <= lines2.length; j++) {
+                if (Util.isLineMatch(lines1[i - 1], lines2[j - 1])) {
+                    d[i][j] = d[i - 1][j - 1]; // 不做任何操作
+                } else {
+                    d[i][j] = Math.min(Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1), d[i - 1][j - 1] + 1); // 删除、插入、替换
+                }
+            }
+        }
+
+        int i = lines1.length;
+        int j = lines2.length;
+
+        List<String> result = new ArrayList<>();
+        Map<Integer, Integer> sec2first = new HashMap<>();
+        while (i > 0 || j > 0) {
+            if (i > 0 && j > 0 && Util.isLineMatch(lines1[i - 1], lines2[j - 1])) {
+                result.add(" " + lines1[i - 1]);
+                sec2first.put(j - 1, i - 1); // 存储匹配的行索引
+                i--;
+                j--;
+            } else if (i > 0 && (j == 0 || d[i][j] == d[i - 1][j] + 1)) {
+                result.add("- " + lines1[i - 1]);
+                i--;
+            } else if (j > 0 && (i == 0 || d[i][j] == d[i][j - 1] + 1)) {
+                result.add("+ " + lines2[j - 1]);
+                j--;
+            } else {
+                result.add("~ " + lines1[i - 1] + " -> " + lines2[j - 1]);
+                i--;
+                j--;
+            }
+        }
+        // 反转结果列表
+        List<String> reversedResult = new ArrayList<>();
+        for (int k = result.size() - 1; k >= 0; k--) {
+            reversedResult.add(result.get(k));
+        }
+
+        for (String s : reversedResult) {
+            System.out.println(s);
+        }
+        return reversedResult;
+    }
+
+    public static void fromJSONPrintTry(JSONObject jsonObject) {
+        try {
+            String[] methodAfterLines = ((String) jsonObject.get("methodAfter")).split("\n");
+            String[] methodBeforeLines = ((String) jsonObject.get("methodBefore")).split("\n");
+            Integer afterStart = jsonObject.getInt("afterTargetStartLine");
+            Integer afterEnd = jsonObject.getInt("afterTargetEndLine");
+            Integer beforeStart = jsonObject.getInt("beforeTargetStartLine");
+            Integer beforeEnd = jsonObject.getInt("beforeTargetEndLine");
+            System.out.println("---------------------------------------------------");
+            System.out.println("method name: " + jsonObject.get("methodName"));
+            System.out.println("-------------------method before-------------------");
+            for (int i = 0; i < methodBeforeLines.length; i++) {
+                String mark = "";
+                if (i >= beforeStart && i < beforeEnd){
+                    mark = "O ";
+                } else {
+                    mark = "  ";
+                }
+                System.out.println(mark + methodBeforeLines[i]);
+            }
+            System.out.println("-------------------method  after-------------------");
+            for (int i = 0; i < methodAfterLines.length; i++) {
+                String mark = "";
+                if (i >= afterStart && i < afterEnd){
+                    mark = "O ";
+                } else {
+                    mark = "  ";
+                }
+                System.out.println(mark + methodAfterLines[i]);
+            }
+
+        } catch (Exception ignore) {
+            System.err.println("json format error");
+        }
+    }
+}

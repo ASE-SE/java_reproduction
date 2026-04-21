@@ -1,0 +1,10 @@
+{
+  "analysis": "在代码片段中，`substring`方法被多次调用，主要出现在以下位置：\n1. `line.substring(0,line.indexOf(\"=\"))` 和 `line.substring(line.indexOf(\"=\") + 1)`：这些调用在`if (line.contains(\"=\"))`条件下执行，确保字符串包含\"=\"，因此`indexOf(\"=\")`不会返回-1，避免了`beginIndex`为负数的情况。但`endIndex`可能超过字符串长度，如果`line.indexOf(\"=\")`返回的值接近字符串末尾，`line.substring(line.indexOf(\"=\") + 1)`可能抛出`IndexOutOfBoundsException`。\n2. `val.substring(val.indexOf(\":\") + 1,val.indexOf(\"\"\",3))`：在`if (key.equals(\"listen_addresses\"))`条件下执行，但未检查`val.indexOf(\":\")`和`val.indexOf(\"\"\",3)`的返回值是否有效（如-1或顺序颠倒），可能抛出`IndexOutOfBoundsException`。\n3. `val.substring(val.indexOf(\"\"\") + 1,val.indexOf(\":\"))`：在`if (key.equals(\"fallback_resolver\"))`条件下执行，未检查`val.indexOf(\"\"\")`和`val.indexOf(\":\")`的返回值是否有效，可能抛出`IndexOutOfBoundsException`。\n4. `val.substring(val.indexOf(\":\",10) + 1,val.indexOf(\"\"\",10))`：在`if (key.equals(\"proxy\"))`条件下执行，未检查`val.indexOf(\":\",10)`和`val.indexOf(\"\"\",10)`的返回值是否有效，可能抛出`IndexOutOfBoundsException`。\n\n综上，代码中未对`substring`的参数进行有效检查，可能导致`IndexOutOfBoundsException`。",
+  "answer": {
+    "IndexOutOfBoundsException": "未被避免。代码中未对`substring`的`beginIndex`和`endIndex`参数进行有效性检查（如是否越界或顺序颠倒），可能导致此异常。"
+  },
+  "result": [
+    "IndexOutOfBoundsException"
+  ],
+  "remark": "在代码片段中，`IndexOutOfBoundsException`可能在以下场景触发：\n1. 当`line`中`\"=\"`接近字符串末尾时，`line.substring(line.indexOf(\"=\") + 1)`可能越界。\n2. 当`val`中`\":\"`或`\"\"`的位置无效时（如未找到或顺序颠倒），`val.substring`的调用可能越界。例如：\n   - `val`为`\"127.0.0.1:53\"`时，`val.indexOf(\":\",10)`返回-1，导致`substring`参数无效。\n   - `val`为`\"[::1]:53\"`时，`val.indexOf(\":\")`可能返回错误位置，导致`substring`范围无效。"
+}

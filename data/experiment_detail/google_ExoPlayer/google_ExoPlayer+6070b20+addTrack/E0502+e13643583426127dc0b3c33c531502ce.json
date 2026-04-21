@@ -1,0 +1,6 @@
+{
+  "analysis": "代码片段中，`substring` 方法的调用依赖于 `indexOfSlash` 的值，该值通过 `mimeType.indexOf('/')` 获取。在调用 `substring(0, indexOfSlash)` 之前，代码进行了以下检查：1. 如果 `mimeType` 为 `null`，直接返回 `null`，避免了空指针异常；2. 如果 `indexOfSlash == -1`，即字符串中不包含 '/'，也返回 `null`，避免了无效的索引值。根据 `substring` 方法的文档，它可能抛出 `IndexOutOfBoundsException`，抛出条件包括：`beginIndex` 为负、`endIndex` 超过字符串长度、或 `beginIndex > endIndex`。在代码中，`beginIndex` 始终为 `0`，`endIndex` 为 `indexOfSlash`，而 `indexOfSlash` 是通过 `indexOf` 方法获取的，因此它不会为负，也不会超过字符串长度。此外，`indexOfSlash == -1` 的情况已被提前处理，因此 `beginIndex > endIndex` 的情况也被避免。",
+  "answer": "根据分析，`IndexOutOfBoundsException` 的所有抛出条件均被避免。",
+  "result": [],
+  "remark": "代码通过提前检查 `mimeType` 是否为 `null` 和 `indexOfSlash` 是否有效，完全避免了 `substring` 方法可能抛出的 `IndexOutOfBoundsException` 异常。因此，代码片段中没有未被避免的异常类型。"
+}

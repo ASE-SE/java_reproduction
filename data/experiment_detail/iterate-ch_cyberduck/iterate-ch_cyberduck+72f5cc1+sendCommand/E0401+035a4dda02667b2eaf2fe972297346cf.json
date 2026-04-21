@@ -1,0 +1,10 @@
+{
+  "analysis": "1. 代码片段中`System.arraycopy(arr,0,new_arr,0,arr.length)`调用前后分析：\n   - `arr`是成员变量，调用前未显式检查null，但通常在resize前已初始化\n   - `new_arr`由`new byte[len]`创建，保证非null且类型匹配\n   - 源/目标数组类型均为`byte[]`，无类型不匹配问题\n   - 复制长度取`arr.length`，与源数组长度一致\n\n2. 异常类型分析：\n   - NullPointerException：\n     * `arr`未显式检查null，但上下文暗示已初始化\n     * `new_arr`由new创建，保证非null\n   - ArrayStoreException：\n     * 源/目标数组类型明确为byte[]，无类型不匹配\n   - IndexOutOfBoundsException：\n     * `srcPos=0`和`destPos=0`非负\n     * `length=arr.length`，需满足`arr.length <= new_arr.length`\n     * 但`new_arr.length`由参数`len`决定，未检查`len >= arr.length`",
+  "answer": {
+    "NullPointerException": "通过上下文隐含避免（arr通常已初始化，new_arr显式新建）",
+    "ArrayStoreException": "通过类型一致保证完全避免",
+    "IndexOutOfBoundsException": "未完全避免（依赖外部保证len≥arr.length）"
+  },
+  "result": ["IndexOutOfBoundsException"],
+  "remark": "IndexOutOfBoundsException可能触发场景：当调用resize(len)时，若传入的len参数小于当前arr.length，会导致`arr.length > new_arr.length`，此时复制长度超出目标数组边界。调用者需自行保证len≥arr.length，但代码内未做参数校验。"
+}

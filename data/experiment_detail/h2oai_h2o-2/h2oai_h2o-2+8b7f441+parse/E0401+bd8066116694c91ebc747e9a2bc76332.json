@@ -1,0 +1,9 @@
+{
+  "analysis": "1. 代码片段分析：\n   - 方法`add`接收一个`Future`对象，并将其添加到`_pending`数组中。\n   - 在添加之前，会检查`_pending`数组是否已满。如果已满，会先尝试清理已完成的任务，如果仍然满，则调用`Arrays.copyOf`来扩展数组。\n   - `Arrays.copyOf`的参数`_pending`是原始数组，`_pending_cnt << 1`是新长度（当前长度的两倍）。\n\n2. 异常分析：\n   - `NegativeArraySizeException`：当`newLength`为负数时抛出。在代码中，`_pending_cnt`是一个非负整数（因为是数组的当前元素数量），`_pending_cnt << 1`（左移一位相当于乘以2）也必然是非负的，因此不会抛出此异常。\n   - `NullPointerException`：当`original`为`null`时抛出。在代码中，`_pending`是一个数组字段，没有显式检查是否为`null`。如果`_pending`未被初始化（即`null`），调用`Arrays.copyOf`时会抛出`NullPointerException`。",
+  "answer": {
+    "NegativeArraySizeException": "被避免",
+    "NullPointerException": "未被避免"
+  },
+  "result": ["NullPointerException"],
+  "remark": "在代码片段中，`_pending`数组没有进行`null`检查。如果`_pending`未被初始化（即`null`），调用`Arrays.copyOf(_pending, _pending_cnt << 1)`时会触发`NullPointerException`。因此，`NullPointerException`是唯一未被避免的异常。"
+}

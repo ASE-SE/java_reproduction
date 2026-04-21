@@ -1,0 +1,11 @@
+{
+  "analysis": "1. 代码片段中`actions.put(actionKey, action)`调用前，先检查了`actions.containsKey(actionKey)`，如果存在则抛出`IllegalStateException`，这避免了`put`方法覆盖已有键值对的情况。\n2. `UnsupportedOperationException`：未在代码中检查`actions`是否支持`put`操作，未被避免。\n3. `ClassCastException`：`actionKey`是`String`类型，`action`是`NewAction`类型，假设`actions`的键值类型匹配，则被避免。\n4. `NullPointerException`：未检查`actionKey`或`action`是否为null，未被避免。\n5. `IllegalArgumentException`：未检查键或值的属性是否合法，未被避免。",
+  "answer": {
+    "UnsupportedOperationException": "未被避免",
+    "ClassCastException": "被避免",
+    "NullPointerException": "未被避免",
+    "IllegalArgumentException": "未被避免"
+  },
+  "result": ["UnsupportedOperationException", "NullPointerException", "IllegalArgumentException"],
+  "remark": "1. `UnsupportedOperationException`：若`actions`是`Collections.unmodifiableMap`等不可变map，调用`put`时会触发。\n2. `NullPointerException`：若传入的`actionKey`为null，且`actions`不允许null键时触发。\n3. `IllegalArgumentException`：若`actions`对键/值有特殊约束（如长度、格式等），而`actionKey`或`action`不满足时触发。"
+}
