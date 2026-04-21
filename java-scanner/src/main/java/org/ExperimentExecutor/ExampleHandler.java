@@ -365,7 +365,7 @@ public class ExampleHandler {
     }
 
     public static String getDataRecord(ExampleData data, String name) {
-        String filePath = data.getDataPath() + "\\" + name + ".json";
+        String filePath = data.getDataPath() + File.separator + name + ".json";
         if (! isFileExists(filePath)) {
             return null;
         }
@@ -395,7 +395,7 @@ public class ExampleHandler {
     }
 
     public static boolean writeDataRecord(ExampleData data, String content, String name) {
-        String filePath = data.getDataPath() + "\\" + name + ".json";
+        String filePath = data.getDataPath() + File.separator + name + ".json";
         try {
             Path path = Paths.get(filePath);
             // 如果父目录不存在，则创建所有必要的父目录
@@ -724,9 +724,9 @@ public class ExampleHandler {
         public String getDataPath() {
             return new StringBuilder()
                     .append(EXPERIMENT_DATA_PATH)
-                    .append("\\")
+                    .append(File.separator)
                     .append(getRepo_id().replaceAll("/", "_"))
-                    .append("\\")
+                    .append(File.separator)
                     .append(getQualifiedName())
                     .toString();
         }

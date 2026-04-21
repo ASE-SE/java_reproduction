@@ -185,7 +185,7 @@ public class ProjectParser {
         if (this.fileSourceMap.containsKey(path)){
             String sourcePath = this.fileSourceMap.get(path);
             String shortPath = path.substring(sourcePath.length(), path.length() - 5);
-            return shortPath.replaceAll("\\\\", ".");
+            return shortPath.replace(File.separatorChar, '.');
         }
         else {
             return null;
@@ -200,7 +200,7 @@ public class ProjectParser {
         while (typeBinding.isNested()) {
             typeBinding = typeBinding.getDeclaringClass();
         }
-        String path = typeBinding.getQualifiedName().replaceAll("\\.", "\\\\") + ".java";
+        String path = typeBinding.getQualifiedName().replace('.', File.separatorChar) + ".java";
         for (String absPath: javaFiles) {
             if (absPath.endsWith(path)) {
                 return absPath;

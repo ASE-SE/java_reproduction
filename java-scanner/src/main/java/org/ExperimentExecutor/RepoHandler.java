@@ -75,7 +75,7 @@ public class RepoHandler {
             return null;
         }
         String folderName = name.replaceAll("/", "_");
-        String localPath = REPOSITORY_DATA_PATH + "\\" + folderName;
+        String localPath = REPOSITORY_DATA_PATH + File.separator + folderName;
         // 确认若已存在本地仓库则直接返回路径
         if (checkFolderExists(REPOSITORY_DATA_PATH, folderName)) {
             LOGGER.info("local repository found: " + localPath);

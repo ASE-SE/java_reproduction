@@ -6,6 +6,7 @@ import org.jdkAnalyzer.ProjectParser;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 
+import java.io.File;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -109,7 +110,7 @@ public class TreeGenerator {
         if (lastIndex == -1) {
             return null;
         }
-        String fileName = qualifiedName.substring(0, lastIndex).replaceAll("\\.", "\\\\") + ".java";
+        String fileName = qualifiedName.substring(0, lastIndex).replace('.', File.separatorChar) + ".java";
         for (String filePath: projectParser.getJavaFiles()) {
             if (filePath.endsWith(fileName)) {
                 CompilationUnit cu = projectParser.getCompilationUnitWithBindings(filePath);
@@ -129,7 +130,7 @@ public class TreeGenerator {
      * @return 对应方法的Binding
      */
     public IMethodBinding getMethodBindingByFileAndName(String filePath, String name) {
-        String fileRelativePath = filePath.substring(filePath.indexOf("/")).replaceAll("/", "\\\\");
+        String fileRelativePath = filePath.substring(filePath.indexOf("/")).replace('/', File.separatorChar);
         for (String fileAbsPath: projectParser.getJavaFiles()) {
             if (fileAbsPath.endsWith(fileRelativePath)) {
                 CompilationUnit cu = projectParser.getCompilationUnitWithBindings(fileAbsPath);
