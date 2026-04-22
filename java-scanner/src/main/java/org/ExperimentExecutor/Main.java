@@ -54,6 +54,10 @@ public class Main {
                         "unrecoverable failure on sample " + processingData.getMethodName()
                                 + " in " + processingData.getRepo_id() + "; marking label=-1 and continuing",
                         t);
+            }
+            if (results == null || results.isEmpty()) {
+                LOGGER.warning("no usable result for " + processingData.getMethodName()
+                        + " in " + processingData.getRepo_id() + "; marking label=-1");
                 ExampleHandler.ExampleData failed = new ExampleHandler.ExampleData(processingData);
                 failed.setLabel(-1);
                 results = List.of(failed);
