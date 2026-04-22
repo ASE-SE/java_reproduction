@@ -47,19 +47,25 @@ public class Main {
         ExampleHandler.ExampleData processingData = ExampleHandler.getNextData(false);
         while (processingData != null) {
             List<ExampleHandler.ExampleData> results = null;
+            boolean analysisCrashed = false;
             try {
                 results = processSingleExample(processingData);
             } catch (Throwable t) {
+                analysisCrashed = true;
                 LOGGER.log(Level.SEVERE,
-                        "unrecoverable failure on sample " + processingData.getMethodName()
+                        "analysis crashed on sample " + processingData.getMethodName()
                                 + " in " + processingData.getRepo_id() + "; marking label=-1 and continuing",
                         t);
             }
             if (results == null || results.isEmpty()) {
+                // -1 = analysis-side failure (JDT / LLM / our bug); -2 = repo unavailable
+                // (clone or checkout failed, typically network). Rerun -2 entries after
+                // fixing connectivity; -1 entries are method-level issues.
+                int label = analysisCrashed ? -1 : -2;
                 LOGGER.warning("no usable result for " + processingData.getMethodName()
-                        + " in " + processingData.getRepo_id() + "; marking label=-1");
+                        + " in " + processingData.getRepo_id() + "; marking label=" + label);
                 ExampleHandler.ExampleData failed = new ExampleHandler.ExampleData(processingData);
-                failed.setLabel(-1);
+                failed.setLabel(label);
                 results = List.of(failed);
             }
             ExampleHandler.addResults(results);
