@@ -58,7 +58,7 @@ public class ProjectHandler {
             // Open your local repository using JGit
             // Get a repository
             Repository repository = new FileRepositoryBuilder()
-                    .setGitDir(new File(repositoryPath+"\\.git"))
+                    .setGitDir(new File(repositoryPath, ".git"))
                     .build();
             // Create a RevWalk object
             RevWalk walk = new RevWalk(repository);
@@ -128,7 +128,7 @@ public class ProjectHandler {
             // Open your local repository using JGit
             // Get a repository
             Repository repository = new FileRepositoryBuilder()
-                    .setGitDir(new File(repositoryPath+"\\.git"))
+                    .setGitDir(new File(repositoryPath, ".git"))
                     .build();
             // Create a RevWalk object
             RevWalk walk = new RevWalk(repository);
