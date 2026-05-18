@@ -1,0 +1,9 @@
+{
+  "analysis": "The code snippet is from a synchronized method `add(Future f)`. It checks for null `f`, checks if `f.isDone()`, then if the pending count equals the array length, it calls `cleanCompleted()` and if still full, resizes the array using `Arrays.copyOf(_pending, _pending_cnt << 1)`. The API documentation for `copyOf` declares: NegativeArraySizeException if newLength is negative; NullPointerException if original is null.\n\nFor NullPointerException: The original array `_pending` is accessed just before the `copyOf` call in the condition `_pending_cnt == _pending.length`. If `_pending` were null, this access would throw a NullPointerException at that point, preventing the call to `copyOf`. Therefore, by the time `copyOf` is called, `_pending` is guaranteed non-null (assuming no concurrent modification, and the method is synchronized). So NullPointerException is avoided.\n\nFor NegativeArraySizeException: The new length is `_pending_cnt << 1`. `_pending_cnt` is a non-negative integer count of pending futures. However, when `_pending_cnt` is large enough that a left shift causes overflow, the result can become negative. For example, if `_pending_cnt` is 2^30, shifting left gives 2^31, which overflows to a negative int. This would trigger NegativeArraySizeException. The code does not check for overflow or bound the value, so this exception is not fully avoided.",
+  "answer": {
+    "NegativeArraySizeException": "not avoided",
+    "NullPointerException": "avoided"
+  },
+  "result": ["NegativeArraySizeException"],
+  "remark": "The only non-avoided exception is NegativeArraySizeException. It can be triggered if `_pending_cnt` is large enough that shifting it left by one (i.e., `_pending_cnt << 1`) produces a negative integer due to integer overflow. Since `_pending_cnt` grows without explicit bounds checking, this scenario is possible when the number of pending futures exceeds 2^30."
+}

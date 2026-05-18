@@ -1,0 +1,14 @@
+[
+{
+  "analysis": "The method `logIssue` first logs the issue by adding a new `ReportEntry` to the `entries` collection. It then checks if the issue's level is at least as severe as `exceptionLevel`. If so, and if the issue contains a throwable, it throws a new `RuntimeException` wrapping the issue's message and the original throwable. If no throwable exists, it throws a `RuntimeException` with just the message. The logging occurs before the throw, meaning the issue is recorded regardless. The programmer deliberately throws a `RuntimeException` (an unchecked exception) only for high-severity issues, suggesting an intent to signal an exceptional condition that the caller should be aware of. The absence of any `@throws` documentation for `RuntimeException` in the Javadoc may indicate an oversight, but the action of throwing itself implies an expectation that the exception will be caught and handled by a caller or a higher-level exception handler, such as to abort processing or escalate the error.",
+  "answer": "yes",
+  "result": "should catch",
+  "remark": "The exception is thrown when the issue's level is at least as severe as `exceptionLevel` and the issue contains a throwable (or just a message). This typically indicates a severe error that the caller should handle, such as aborting the current operation or escalating the issue. The logging has already been performed, so the exception serves as a notification to the caller to take appropriate action."
+},
+{
+  "analysis": "The method `logIssue` first logs the issue by adding a `ReportEntry`. Then it checks if the issue's level is greater than or equal to `exceptionLevel`. If so, it throws a `RuntimeException`. The throw occurs only when the condition is true, indicating that the programmer intentionally propagates severe issues as runtime exceptions. The logging happens before the throw, so the exception is meant to alert the caller about a significant problem after the log entry has been made. The programmer expects the caller to handle this exception appropriately, as it signals a condition that likely requires special attention or recovery.",
+  "answer": "yes",
+  "result": "should catch",
+  "remark": "The `RuntimeException` is thrown when the issue's level meets or exceeds `exceptionLevel` and the issue does not contain a `Throwable`. This scenario represents a severe issue that the programmer wants to escalate to the caller, expecting it to be caught and handled."
+}
+]

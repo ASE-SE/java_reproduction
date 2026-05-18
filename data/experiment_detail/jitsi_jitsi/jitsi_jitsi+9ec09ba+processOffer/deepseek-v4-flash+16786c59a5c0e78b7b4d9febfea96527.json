@@ -1,0 +1,8 @@
+[
+{
+  "analysis": "The method `nextExtensionID()` uses an infinite loop to find the next unallocated dynamic extension ID. It checks if `nextExtensionMapping` is negative (<0); if so, it throws an `IllegalStateException` with a message indicating that no more than 255 RTP extensions can be mapped. Otherwise, it increments `nextExtensionMapping` and assigns the previous value to `extID`, then checks if `findExtension(extID)` returns null (i.e., the ID is free). If null, it returns `extID`; if not, the loop continues. The condition `nextExtensionMapping < 0` is intended to detect when the maximum number of 255 extensions have already been allocated, triggering an unrecoverable state. The Javadoc explicitly documents this exception at the method level, indicating the programmer's awareness of this exceptional condition.",
+  "answer": "Yes, the programmer expected the thrown runtime exception to be caught and handled by the caller.",
+  "result": "should catch",
+  "remark": "The exception is thrown when the method tries to map more than 255 RTP extensions, i.e., when `nextExtensionMapping` becomes negative (interpreted as an overflow beyond the 255th extension). The Javadoc clearly states that this `IllegalStateException` occurs when already registered RTP extension headers exceed the allowed limit, making it an anticipated error condition that callers should handle appropriately."
+}
+]

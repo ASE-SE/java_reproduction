@@ -1,0 +1,10 @@
+{
+  "analysis": "The code snippet calls `Arrays.fill(elements, uniques, n, null)`. The variables are: `elements` (Object array passed as parameter), `uniques` (number of unique elements, computed in loop, always <= n), `n` (parameter indicating number of elements to process). The `fill` method's documentation declares three exceptions: IllegalArgumentException (if fromIndex > toIndex), ArrayIndexOutOfBoundsException (if fromIndex < 0 or toIndex > a.length), and ArrayStoreException (if val cannot be stored). Analyzing each: 1. **IllegalArgumentException**: fromIndex = uniques, toIndex = n. Since uniques <= n (uniques counts unique elements within the first n elements, so it never exceeds n), fromIndex <= toIndex. The case fromIndex == toIndex is valid (empty range). Thus the condition is avoided. 2. **ArrayIndexOutOfBoundsException**: fromIndex = uniques >= 0 (starts at 0 and only increases). toIndex = n. The method's contract assumes n <= elements.length (the method processes the first n elements of the array, and accessing elements[i] for i < n would also be out of bounds otherwise). Under this assumption, toIndex <= elements.length. Hence both conditions (fromIndex < 0 or toIndex > a.length) are avoided. 3. **ArrayStoreException**: The value being stored is null. null can be stored in any Object array regardless of runtime type, so no type mismatch occurs. Thus this exception is avoided. Overall, all three exceptions are avoided in the given calling context under the implicit precondition that n <= elements.length.",
+  "answer": {
+    "IllegalArgumentException": "avoided",
+    "ArrayIndexOutOfBoundsException": "avoided",
+    "ArrayStoreException": "avoided"
+  },
+  "result": [],
+  "remark": "No exception is triggered because: (1) fromIndex (uniques) is always ≤ toIndex (n), so IllegalArgumentException is avoided; (2) fromIndex is non-negative and toIndex does not exceed the array length (given the method's precondition that n is within bounds), so ArrayIndexOutOfBoundsException is avoided; (3) the stored value null is universally assignable, so ArrayStoreException is avoided."
+}

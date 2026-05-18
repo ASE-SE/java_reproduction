@@ -1,0 +1,8 @@
+[
+{
+  "analysis": "The method resolveConcreteDispatch resolves the concrete method that would be invoked on an object of type concreteType. It first checks that both concreteType and the declaring class of m are at the proper hierarchy level. Then it checks if concreteType is an interface. If it is, that is invalid because concrete dispatch requires a concrete class (non-interface). The throw statement is a precondition check: the programmer intends that this method should only be called with concrete classes, not interfaces. The runtime exception is thrown to signal a programming error. The execution flow then would terminate unless caught. The rest of the method iterates over superclasses to find the method. The second throw at the end indicates if no method is found. The first throw is for invalid input type.",
+  "answer": "No, the programmer did not expect the runtime exception to be caught externally. It is thrown as a defensive check to indicate that the caller passed an interface where a concrete class is required. This is a programming error, and the exception is meant to crash the program or be left uncaught to highlight the bug.",
+  "result": "no catch",
+  "remark": "The exception is thrown when concreteType.isInterface() returns true. The method is designed to resolve concrete dispatch for concrete classes only. If an interface is passed, it indicates a misuse of the API. The programmer explicitly checks this condition and throws a RuntimeException with message 'class needed!' to alert the developer that a class type is required, not an interface. This is a precondition violation, and the exception is not intended to be caught by the caller but rather to indicate an error that should be fixed in the calling code."
+}
+]

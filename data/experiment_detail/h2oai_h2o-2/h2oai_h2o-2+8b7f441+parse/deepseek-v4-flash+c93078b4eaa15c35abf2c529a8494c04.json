@@ -1,0 +1,10 @@
+{
+  "analysis": "The code snippet is in a method `blockForPending()` that loops over pending futures stored in an array `_pending` and calls `f.get()` on each. The `get()` method can throw CancellationException (if the future was cancelled), ExecutionException (if the future's computation threw an exception), and InterruptedException (if the current thread is interrupted). The code catches InterruptedException and ExecutionException, rethrowing them as runtime exceptions. However, CancellationException is not caught. There is no prior validation or check to ensure that the futures are not cancelled before calling `get()`. Therefore, the throwing condition for CancellationException is not avoided, while the conditions for the other two exceptions are handled by the catch blocks.",
+  "answer": {
+    "CancellationException": false,
+    "ExecutionException": true,
+    "InterruptedException": true
+  },
+  "result": ["CancellationException"],
+  "remark": "CancellationException is not avoided because the code does not check whether a future has been cancelled before calling `get()`, and it is not caught. It will be thrown if any pending future was cancelled, propagating up the call stack unhandled."
+}

@@ -1,0 +1,6 @@
+{
+  "analysis": "The method `contains` creates a key via `buildKey(accountName, remotePath)`, which returns a `String` (exact implementation unknown). This key is passed to `mMap.containsKey(targetKey)`. The method has no null check on `targetKey` before the call, and no type validation of the key against the map's expected key type. The map `mMap` is not declared with generic type parameters in the snippet, so its key type is unknown. The documentation of `containsKey` declares two optional exceptions: `NullPointerException` (if key is null and map does not permit null keys) and `ClassCastException` (if key type is inappropriate). Since the calling context does not perform any checks to prevent these conditions (e.g., null check or type verification), both exceptions remain possible.",
+  "answer": "NullPointerException: not avoided; ClassCastException: not avoided",
+  "result": ["NullPointerException", "ClassCastException"],
+  "remark": "NullPointerException can be triggered if `buildKey` returns `null` and `mMap` does not permit null keys (implementation-dependent). ClassCastException can be triggered if `mMap` expects a key type incompatible with `String` (e.g., if `mMap` is a raw type or uses a comparator that rejects `String`) and no compile-time type safety is enforced."
+}

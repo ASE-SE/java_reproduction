@@ -1,0 +1,10 @@
+{
+  "analysis": "The code calls System.setProperty multiple times with hardcoded string literals as keys (e.g., 'java.net.preferIPv6Addresses', 'javax.net.ssl.trustStoreType') and values from String.valueOf(boolean) or string literals (e.g., 'JKS', '10', '5'). No use of null keys or values. All keys are non-empty. Therefore, IllegalArgumentException (empty key) and NullPointerException (null key/value) are fully avoided by the static nature of the arguments. However, SecurityException occurs if a security manager is present and its checkPermission method denies write access to the specified system property. The code does not check for a security manager, attempt to catch SecurityException, or execute any privileged action. Thus, SecurityException is not avoided.",
+  "answer": {
+    "SecurityException": "not avoided",
+    "NullPointerException": "avoided",
+    "IllegalArgumentException": "avoided"
+  },
+  "result": ["SecurityException"],
+  "remark": "SecurityException can be thrown at any of the System.setProperty calls if a security manager is installed (e.g., via command-line flags or deployment contexts) and the specific property key is not allowed write permission. The code does not guard against this scenario, so the exception is possible and unavoidable given the current context."
+}

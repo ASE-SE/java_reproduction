@@ -1,0 +1,6 @@
+{
+  "analysis": "The code snippet defines a method `getCertsByIssuer` that iterates over aliases in a KeyStore and builds a map from subject DN to list of certificates. The API method of interest is `get`, which is called as `answer.get(subjectDN)` where `answer` is a `HashMap<Principal, List<X509Certificate>>`. The documentation for `Map.get` declares two optional exceptions: `ClassCastException` if the key type is inappropriate, and `NullPointerException` if the key is null and the map does not permit null keys. In this context, `subjectDN` is a `Principal` object obtained from `cert.getSubjectDN()`. `HashMap` permits null keys, so passing a null key does not cause a `NullPointerException`. Additionally, `HashMap` does not enforce type constraints at runtime, so even if the key is not a `Principal`, a `ClassCastException` is not thrown. Therefore, both exceptions are fully avoided by the calling context.",
+  "answer": "ClassCastException: avoided; NullPointerException: avoided",
+  "result": [],
+  "remark": "Both `ClassCastException` and `NullPointerException` are avoided because `HashMap.get` does not throw `ClassCastException` (it uses object equality without runtime type checking) and permits null keys, so `NullPointerException` is not thrown even if `subjectDN` is null."
+}

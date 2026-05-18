@@ -1,0 +1,6 @@
+{
+  "analysis": "The code calls Thread.sleep(backoff * 1000L) inside a while loop. Before the call, backoff is initialized to CONNECT_BACKOFF_START and only multiplied by 2 when less than CONNECT_BACKOFF_MAX, so backoff is always non-negative. Therefore, millis is never negative, so IllegalArgumentException cannot occur. The call is inside a try block that catches InterruptedException, but the occurrence of InterruptedException depends on external interruption, which cannot be prevented by any pre-check. Thus InterruptedException is not avoided; it is only handled.",
+  "answer": "IllegalArgumentException: avoided (millis is always non-negative). InterruptedException: not avoided (interruption cannot be prevented).",
+  "result": ["InterruptedException"],
+  "remark": "The only exception that can still occur is InterruptedException. It can be thrown if the current thread is interrupted while sleeping. For example, if another thread calls `thread.interrupt()` on the current thread, the sleep will throw InterruptedException."
+}

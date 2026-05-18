@@ -1,0 +1,9 @@
+{
+  "analysis": "The code snippet provided is a method `onMessage` of a class that implements a `WebSocket` listener. The method is invoked when a message is received from the WebSocket. The method processes the message, checking for specific conditions, and in one of the branches, it calls `Thread.sleep(50)` if a write operation to `out` returns 0, indicating no bytes were written. The `sleep` method is documented to throw `IllegalArgumentException` if the argument is negative, and `InterruptedException` if the thread is interrupted. In the context of the code, the `IllegalArgumentException` is avoided as the argument passed to `sleep` is a constant positive value, 50. However, the `InterruptedException` is not avoided, as it is a standard part of the sleep operation and the code explicitly handles this exception, preserving the interrupted status of the thread and potentially closing the WebSocket if the thread is still considered alive.",
+  "answer": {
+    "IllegalArgumentException": "Avoided, because the argument passed to `Thread.sleep` is a positive constant (50).",
+    "InterruptedException": "Not avoided, because it is a natural part of the `Thread.sleep` operation and the code handles it, ensuring the thread's interrupted status is preserved and potentially closing the WebSocket."
+  },
+  "result": ["InterruptedException"],
+  "remark": "The `InterruptedException` is not avoided and can be triggered if another thread interrupts the thread that is currently sleeping. This interruption could occur for various reasons, such as a timeout, a shutdown signal, or a specific condition in the application logic that requires the current operation to be stopped. The code handles this scenario by marking the thread as interrupted, adding the exception to a list of client throwables, logging the error, and closing the WebSocket with a protocol error code, effectively stopping the ongoing operation and cleaning up."
+}

@@ -57,11 +57,24 @@ public class TryBlock {
         return validCodeIndexes;
     }
 
-    protected static int findStartIndex(String[] a, String[] b) throws IllegalStateException{
-        // 在a中寻找b的起始位置
+    /** 是否成功在 methodBlock 中定位到该 try 块。未定位的 TryBlock 不应进入主流程。 */
+    public boolean isLocated() {
+        return formatStartLine >= 0 && formatLength > 0 && formatStartLine + formatLength <= fullMethodBlock.split("\n").length;
+    }
+
+    /**
+     * 在 a 中寻找 b 的起始行。两层 fallback：
+     *   Pass 1 — 精确逐行匹配；
+     *   Pass 2 — 首尾非空行锚定 + 非空行匹配率 >= 0.7。
+     * 失败返回 -1（之前的版本会抛 IllegalStateException 让整个 analyze 失败，过于脆弱：
+     * 单个 try 块定位不下来不应该让所有 try 块都失效）。
+     */
+    protected static int findStartIndex(String[] a, String[] b) {
         int n = a.length;
         int m = b.length;
+        if (m == 0 || m > n) return -1;
 
+        // Pass 1: 精确逐行匹配
         for (int i = 0; i <= n - m; i++) {
             boolean match = true;
             for (int j = 0; j < m; j++) {
@@ -71,10 +84,36 @@ public class TryBlock {
                 }
             }
             if (match) {
-                return i; // 返回匹配的起始索引
+                return i;
             }
         }
-        throw new IllegalStateException("try block match error");
+
+        // Pass 2: 容错 fallback
+        int bFirst = 0;
+        while (bFirst < m && b[bFirst].replaceAll("[\\s\t]", "").isEmpty()) bFirst++;
+        int bLast = m - 1;
+        while (bLast >= 0 && b[bLast].replaceAll("[\\s\t]", "").isEmpty()) bLast--;
+        if (bFirst > bLast) {
+            return -1;
+        }
+        int bestStart = -1;
+        double bestScore = -1.0;
+        for (int i = 0; i <= n - m; i++) {
+            if (!Util.isLineMatchWithoutIndentation(a[i + bFirst], b[bFirst])) continue;
+            if (!Util.isLineMatchWithoutIndentation(a[i + bLast], b[bLast])) continue;
+            int hit = 0, total = 0;
+            for (int j = 0; j < m; j++) {
+                if (b[j].replaceAll("[\\s\t]", "").isEmpty()) continue;
+                total++;
+                if (Util.isLineMatchWithoutIndentation(a[i + j], b[j])) hit++;
+            }
+            double score = total == 0 ? 0.0 : (double) hit / total;
+            if (score >= 0.7 && score > bestScore) {
+                bestScore = score;
+                bestStart = i;
+            }
+        }
+        return bestStart;  // 仍可能是 -1
     }
 
     public TryStatement getTryNode() {

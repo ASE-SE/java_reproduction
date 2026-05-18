@@ -1,0 +1,8 @@
+[
+{
+  "analysis": "The method `replace(String what, Object with)` first checks if the first character of the `what` string is '$'. If true, it throws a RuntimeException with a message indicating that '$' is now a control character for URL encoding. This is a precondition check that prevents further processing when an invalid placeholder name is provided. After the check, the method proceeds to iterate over placeholders matching the exact `what` string and placeholders with a '$' prefix. The throw occurs unconditionally upon the condition, and there is no try-catch block wrapping it within the method. As an unchecked exception, it propagates to the caller. The condition is a clear misuse case: passing a placeholder starting with '$' violates the intended usage, as '$' is reserved. The programmer likely intends this as a fail-fast guard to signal a programming error, not as a recoverable condition that should be caught and handled by the caller.",
+  "answer": "The programmer likely did not expect this runtime exception to be caught externally. It is thrown to indicate an invalid input that violates the method's contract, pointing to a programming error. Callers are expected to ensure that the `what` parameter does not start with '$'.",
+  "result": "no catch",
+  "remark": "The exception is thrown as a guard clause when the `what` string starts with '$', because '$' is reserved as a control character for URL encoding in the placeholder system. This prevents processing of invalid placeholder names and signals a misuse that should be fixed in the calling code rather than caught at runtime."
+}
+]

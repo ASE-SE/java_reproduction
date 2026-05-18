@@ -1,0 +1,6 @@
+{
+  "analysis": "The code snippet defines a method `schedule` that delegates to `timer.schedule` with a wrapped task. The API documentation for the underlying method declares three exceptions: IllegalArgumentException (if delay is negative or overflow), IllegalStateException (if task/timer state invalid), and NullPointerException (if task is null). In the snippet, there are no checks for delay negativity or timer/task state, so the first two exceptions are not avoided. However, the task is wrapped in a non-null `TimerTaskWrapper` before passing to `timer.schedule`, so the NPE from the underlying method is avoided because the argument is always non-null. The wrapper constructor may throw its own NPE if task is null, but that is not the declared exception of the API method.",
+  "answer": "IllegalArgumentException: not avoided; IllegalStateException: not avoided; NullPointerException: avoided",
+  "result": ["IllegalArgumentException", "IllegalStateException"],
+  "remark": "IllegalArgumentException is thrown if the delay is negative or if the addition of delay and System.currentTimeMillis() overflows to a negative value. IllegalStateException is thrown if the task was already scheduled or cancelled, or if the timer was cancelled or its thread terminated. The code does not perform any checks to prevent these conditions, so they can occur."
+}

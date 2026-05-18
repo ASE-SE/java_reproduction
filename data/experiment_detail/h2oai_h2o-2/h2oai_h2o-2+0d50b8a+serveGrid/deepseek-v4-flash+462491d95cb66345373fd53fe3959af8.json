@@ -1,0 +1,8 @@
+[
+{
+  "analysis": "The method replace starts by checking if the first character of the `what` parameter is '$'. If so, it throws a RuntimeException immediately. This is a guard clause designed to prevent the use of '$' as a prefix for the placeholder name because '$' is reserved as a control character indicating URL encoding. The rest of the method then processes the placeholder: first by exact match (what) and then by URL-encoded version ('$' + what). If a caller passes a string starting with '$', it would cause ambiguity because the first loop would match a placeholder that is actually intended for URL-encoded replacements, and the second loop would double-add '$' (e.g., '$$' prefix). The throw prevents this misuse. Since RuntimeException is an unchecked exception, the programmer likely intended this as a programming error (precondition violation) rather than a recoverable condition. The message clearly states the reason, expecting the caller to avoid such input. Thus, the runtime exception is not intended to be caught externally; it signals a bug in the calling code.",
+  "answer": "No, the programmer did not expect the thrown runtime exception to be caught externally. It is a guard against misuse, indicating a programming error.",
+  "result": "no catch",
+  "remark": "The exception is thrown when the `what` parameter starts with '$'. This prevents ambiguity because '$' is used internally to denote URL-encoded placeholders (the method also handles '$' + what). The programmer expects callers to never pass such strings, so the exception signals a precondition violation, not a recoverable condition. It is not meant to be caught but rather to be fixed in the calling code."
+}
+]

@@ -1,0 +1,9 @@
+{
+  "analysis": "The method getNextBlock calls Thread.sleep(75) in the else branch after a failed ID block acquisition. The argument is a constant positive integer (75), so IllegalArgumentException (which requires a negative argument) cannot occur. InterruptedException can be thrown if the current thread is interrupted during the sleep. The code catches InterruptedException with an empty catch block, which prevents propagation but does not avoid the throwing condition; the exception can still be thrown and caught. Therefore, InterruptedException is not avoided.",
+  "answer": {
+    "IllegalArgumentException": "avoided (constant positive argument ensures condition never met)",
+    "InterruptedException": "not avoided (no check prevents thread interruption; exception can still occur and is caught)"
+  },
+  "result": ["InterruptedException"],
+  "remark": "InterruptedException can be triggered if another thread calls interrupt() on the current thread while it is sleeping inside Thread.sleep(75). The empty catch block handles it but does not prevent the exception from being thrown."
+}

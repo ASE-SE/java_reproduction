@@ -1,0 +1,6 @@
+{
+  "analysis": "The code snippet defines `normalizeScheme(String url)` that calls `URI.create(url)` without any prior validation. Before the call, there is no null check on `url`, and no attempt to verify that the string is a legal URI. After the call, the code uses the resulting URI object, but if the input is invalid, it will never reach that point because an exception will have been thrown. The `URI.create` method throws `NullPointerException` if the argument is null, and `IllegalArgumentException` if the argument violates RFC 2396. Neither of these conditions is checked or avoided in the calling code.",
+  "answer": "NullPointerException: Thrown if `url` is null. This condition is not avoided because there is no null check before the call.\nIllegalArgumentException: Thrown if `url` is not a valid URI. This condition is not avoided because there is no validation of the input string format.",
+  "result": ["NullPointerException", "IllegalArgumentException"],
+  "remark": "The exceptions that are not avoided are triggered in the following scenarios:\n- NullPointerException: Occurs when the `url` parameter passed to `normalizeScheme` is `null`.\n- IllegalArgumentException: Occurs when the `url` parameter is not a syntactically valid URI according to RFC 2396 (e.g., contains illegal characters, missing components, etc.)."
+}

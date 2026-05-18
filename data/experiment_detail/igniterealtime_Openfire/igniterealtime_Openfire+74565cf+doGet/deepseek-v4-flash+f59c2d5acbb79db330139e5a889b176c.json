@@ -1,0 +1,9 @@
+{
+  "analysis": "The code snippet calls `modules.get(SessionManager.class)`, where `modules` is presumably a Map instance. The API documentation for the `get` method lists two declared exceptions: ClassCastException and NullPointerException, both optional (i.e., not all implementations throw them). The key is `SessionManager.class`, a non-null Class object. There are no checks or validations before the call. Therefore, the condition for NullPointerException (key is null and map does not permit null keys) is fully avoided because the key is never null. However, the condition for ClassCastException (key is of an inappropriate type for the map) is not fully avoided; it depends on the actual map implementation. For example, if `modules` is an EnumMap or a map that enforces key types, a Class object might be inappropriate and trigger the exception. The code does not verify or guard against this.",
+  "answer": {
+    "ClassCastException": "not avoided",
+    "NullPointerException": "avoided"
+  },
+  "result": ["ClassCastException"],
+  "remark": "ClassCastException can still be thrown if the map implementation has restrictive type requirements (e.g., EnumMap expects enum keys, or a map parameterized with a specific key type) and `SessionManager.class` does not satisfy those requirements. In typical usage with a general-purpose Map like HashMap, this exception would not occur, but the code does not ensure that such a map is used."
+}

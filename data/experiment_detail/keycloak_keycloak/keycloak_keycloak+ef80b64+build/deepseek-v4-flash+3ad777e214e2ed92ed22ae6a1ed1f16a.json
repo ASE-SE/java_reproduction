@@ -1,0 +1,9 @@
+{
+  "analysis": "The code snippet calls `realm.getEnabledEventTypes().contains(event.getType().name())` inside a ternary condition. The call occurs only if `realm.getEnabledEventTypes()` is not null and not empty, which avoids `NullPointerException` on the set itself. However, the argument `event.getType().name()` could be null if `event.getType()` is null (though typical enum `name()` returns non-null), leading to a possible `NullPointerException` from `contains` if the set does not permit null elements. Additionally, `ClassCastException` may occur if the set's element type is incompatible with the `String` argument (e.g., if the set is of a different type or raw). Neither condition is explicitly checked or avoided by the code before the call. The call is not within any try-catch block; only subsequent code is caught.",
+  "answer": {
+    "ClassCastException": "not avoided",
+    "NullPointerException": "not avoided"
+  },
+  "result": ["ClassCastException", "NullPointerException"],
+  "remark": "The exceptions are not avoided because: (a) `ClassCastException` can be thrown if the set returned by `realm.getEnabledEventTypes()` contains elements of a type incompatible with the `String` argument (e.g., a raw set or a set of a different type). (b) `NullPointerException` can be thrown if `event.getType().name()` returns `null` (possible if `event.getType()` is null, although unlikely for enums) and the set does not permit null elements. The code does not check the type of the set or the nullity of the argument, and no try-catch wraps the call."
+}

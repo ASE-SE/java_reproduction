@@ -1,0 +1,9 @@
+{
+  "analysis": "The code snippet defines a synchronized `get` method that calls `map.get(key)` after calling `deleteExpiredEntries()`. The API method `java.util.Map.get(Object)` is documented to throw `ClassCastException` if the key is of an inappropriate type for the map, and `NullPointerException` if the key is null and the map does not permit null keys. In the calling context, there is no validation or check on the `key` parameter before the call. Specifically, there is no null check, no type check, and no attempt to ensure the key is compatible with the map. Therefore, the throwing conditions for both exceptions are not avoided. After the call, the code performs a null check on `cacheObject`, but this is too late to prevent exceptions from `map.get()`.",
+  "answer": {
+    "ClassCastException": "not avoided",
+    "NullPointerException": "not avoided"
+  },
+  "result": ["ClassCastException", "NullPointerException"],
+  "remark": "`NullPointerException` is triggered if `key` is `null` and the underlying map does not permit null keys (an optional restriction). `ClassCastException` is triggered if the `key`'s type is incompatible with the map's key type (e.g., the map expects `String` but `key` is an `Integer`). Since no validation is performed before calling `map.get(key)`, both exceptions can occur."
+}

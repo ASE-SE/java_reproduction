@@ -1,0 +1,10 @@
+{
+  "analysis": "The code snippet defines a method `blockForPending` that synchronously retrieves results from pending futures in a loop. Prior to calling `f.get()`, no validation is performed on the state of the future (e.g., whether it is cancelled). After the call, `InterruptedException` and `ExecutionException` are caught and rethrown as runtime exceptions via `Log.errRTExcept`. The API documentation for `get` declares three exceptions: `CancellationException` (unchecked), `ExecutionException` (checked), and `InterruptedException` (checked). The code explicitly catches the two checked exceptions, thereby avoiding their propagation. However, `CancellationException` is not caught and no pre-check (e.g., `isCancelled()`) prevents its occurrence. Therefore, `CancellationException` can still be thrown and is not avoided.",
+  "answer": {
+    "CancellationException": "not avoided",
+    "ExecutionException": "avoided",
+    "InterruptedException": "avoided"
+  },
+  "result": ["CancellationException"],
+  "remark": "The `CancellationException` will be thrown if any of the pending futures have been cancelled. Since the loop calls `f.get()` without checking whether the future was cancelled (e.g., via `f.isCancelled()`), the exception can propagate uncaught out of the `blockForPending` method."
+}

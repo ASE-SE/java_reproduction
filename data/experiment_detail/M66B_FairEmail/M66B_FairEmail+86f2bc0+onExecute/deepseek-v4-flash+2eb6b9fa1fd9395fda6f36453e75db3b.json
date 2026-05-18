@@ -1,0 +1,6 @@
+{
+  "analysis": "The code snippet calls `Charset.forName(detected.charset)` where `detected.charset` is obtained from a native detection method. Before the call, there is a check `TextUtils.isEmpty(detected.charset)` which ensures the charset name is non-null and non-empty, thus avoiding `IllegalArgumentException`. However, there are no checks for the legality of the charset name (which could cause `IllegalCharsetNameException`) or whether the charset is supported by the JVM (which could cause `UnsupportedCharsetException`). Therefore, these two exceptions are not avoided.",
+  "answer": "IllegalArgumentException: Throwing condition avoided (null check).\nIllegalCharsetNameException: Throwing condition not avoided.\nUnsupportedCharsetException: Throwing condition not avoided.",
+  "result": ["IllegalCharsetNameException", "UnsupportedCharsetException"],
+  "remark": "`IllegalCharsetNameException` can be triggered if `detected.charset` contains illegal characters (e.g., whitespace, invalid syntax). `UnsupportedCharsetException` can be triggered if the detected charset is not available in the current JVM (e.g., a rare or platform-specific charset). Both conditions are not checked before the `forName` call, so they may still be thrown."
+}

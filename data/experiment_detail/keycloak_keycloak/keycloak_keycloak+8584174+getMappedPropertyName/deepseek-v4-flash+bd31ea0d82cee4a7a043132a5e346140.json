@@ -1,0 +1,6 @@
+{
+  "analysis": "The code snippet calls `property.substring(property.indexOf('.') + 1)` only when `property.startsWith(\"%\")` is true. The `indexOf('.')` method returns the index of the first '.' in `property`, or -1 if none exists. After adding 1, the resulting `beginIndex` is either 0 (if no '.' is present) or a value between 1 and the length of `property` inclusive (if a '.' is present, because the dot's index is at most `length-1`). Java's `substring(int beginIndex)` throws `IndexOutOfBoundsException` only when `beginIndex` is negative or greater than the string length. In this context, `beginIndex` is always non-negative and never exceeds the length: if no dot, beginIndex=0 ≤ length; if dot at the last character, beginIndex=length, which is allowed. Therefore, the exception condition is fully avoided.",
+  "answer": "All declared exceptions are avoided. The only exception in the JavaDoc is `IndexOutOfBoundsException`, and its throwing condition is prevented by the logic of the calling code.",
+  "result": [],
+  "remark": "No exception is triggered because the `beginIndex` passed to `substring` is always within the valid range [0, length()]. The check `startsWith(\"%\")` ensures the call is guarded, and the computation `indexOf('.') + 1` never produces a negative value or a value larger than the string length."
+}

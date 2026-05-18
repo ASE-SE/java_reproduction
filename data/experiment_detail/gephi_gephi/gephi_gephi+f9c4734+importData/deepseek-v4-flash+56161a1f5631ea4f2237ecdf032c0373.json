@@ -1,0 +1,11 @@
+{
+  "analysis": "The snippet defines `logIssue(Issue issue)` which calls `entries.add(new ReportEntry(issue))`. Before the call, no validation or check is performed on the list `entries` or the element `new ReportEntry(issue)`. The `add` method's documentation declares four exceptions. `NullPointerException` is avoided because the element passed to `add` is always a newly created `ReportEntry` object, which is never null, regardless of whether `issue` is null (though `issue` being null would cause `logIssue` to throw its own `NullPointerException` before the `add` call). The other three exceptions are not avoided: `UnsupportedOperationException` can occur if the list does not support the `add` operation; `ClassCastException` can occur if the list's type system is violated (e.g., if the list expects a different type and raw types are used); `IllegalArgumentException` can occur if the element violates some property restriction of the list.",
+  "answer": {
+    "UnsupportedOperationException": "not avoided",
+    "ClassCastException": "not avoided",
+    "NullPointerException": "avoided",
+    "IllegalArgumentException": "not avoided"
+  },
+  "result": ["UnsupportedOperationException", "ClassCastException", "IllegalArgumentException"],
+  "remark": "**UnsupportedOperationException**: Triggered if the list implementation (e.g., `Arrays.asList()` or an immutable collection) does not allow structural modifications via `add`, and no check is made beforehand. **ClassCastException**: Triggered if the list is parameterized with a type incompatible with `ReportEntry` (e.g., raw types or a list of a different class) and the dynamic type check fails at runtime. **IllegalArgumentException**: Triggered if the list rejects the element due to specific constraints (e.g., duplicate prevention, size limits, or custom validation), with no prior validation in the snippet."
+}

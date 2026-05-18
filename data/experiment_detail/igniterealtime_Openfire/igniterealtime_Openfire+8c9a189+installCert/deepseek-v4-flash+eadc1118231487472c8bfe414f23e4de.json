@@ -1,0 +1,6 @@
+{
+  "analysis": "The code calls `CertificateFactory.getInstance(\"X509\").generateCertificates(inputStream)`. Before the call, there is no validation of the `inputStream` content or format; the stream is used directly. After the call, the code checks if the returned collection is empty and throws a custom Exception if so, but this does not prevent `CertificateException` from being thrown during parsing. The API documentation for `generateCertificates` declares only `CertificateException` for parsing errors. No prior checks or validations in the snippet can avoid this exception, as malformed input can still occur.",
+  "answer": "For the declared exception `CertificateException`, its throwing condition is not avoided.",
+  "result": ["java.security.cert.CertificateException"],
+  "remark": "The `CertificateException` is thrown when the input stream contains invalid or unparseable certificate data (e.g., malformed DER encoding or corrupted PKCS#7 chain). In the code snippet, no checks are performed on the stream content before the call, so this exception can occur and is not avoided."
+}

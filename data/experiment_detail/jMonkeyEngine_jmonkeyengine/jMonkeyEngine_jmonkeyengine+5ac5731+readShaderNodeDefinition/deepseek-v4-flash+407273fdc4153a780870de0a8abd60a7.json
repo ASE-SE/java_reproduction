@@ -1,0 +1,14 @@
+[
+{
+  "analysis": "The method `readShaderStatement` parses a Shader statement expecting the format '<TYPE> <LANG> : <SOURCE>'. It first splits the line by ':' and checks that exactly two parts exist; otherwise, it throws a `MatParseException`. Then it splits the first part by whitespace and expects exactly two parts (type and language); otherwise, it throws another `MatParseException`. Since `MatParseException` is a runtime exception, it is not declared in the method signature (only `IOException` is declared). The exception is thrown when the input statement does not match the expected syntax. In typical usage, this method would be called repeatedly to process a list of shader statements. The programmer likely intended the caller to catch this exception to handle malformed statements gracefully (e.g., log an error, skip the statement, or report to the user) rather than letting the program terminate. The detailed error message also suggests that the exception is meant for external handling.",
+  "answer": "Yes, the programmer expected this runtime exception to be caught and handled by the caller.",
+  "result": "should catch",
+  "remark": "The exception is thrown when the input statement does not conform to the expected '<TYPE> <LANG> : <SOURCE>' format, indicating a syntax error that the caller should handle to maintain robust processing (e.g., skip the invalid statement and continue)."
+},
+{
+  "analysis": "The method `readShaderStatement` is designed to parse a shader statement with a specific format: `<TYPE> <LANG> : <SOURCE>`. It first splits the line by colon; if there is not exactly one colon, or if the part before the colon does not split into exactly two tokens (type and language), it throws a `MatParseException` (a runtime exception) indicating a syntax error. The method's signature only declares `throws IOException`, meaning the runtime exception is unchecked. However, given that the method is part of a parser and the exception is explicitly thrown for invalid input, the programmer likely anticipates that callers will want to handle such malformed statements. The runtime exception serves as a clear signal of invalid data, and typical parser design expects callers to catch and respond to such errors, e.g., by reporting to the user or skipping the statement. Hence, the throw is intentional and expects external handling.",
+  "answer": "Yes, the programmer expected the thrown runtime exception to be caught and handled by the caller.",
+  "result": "should catch",
+  "remark": "The exception is thrown when the shader statement does not conform to the required syntax (either missing or extra colons, or missing language/type tokens). This indicates a recoverable parsing error that the caller is expected to handle, such as logging the error or notifying the user."
+}
+]

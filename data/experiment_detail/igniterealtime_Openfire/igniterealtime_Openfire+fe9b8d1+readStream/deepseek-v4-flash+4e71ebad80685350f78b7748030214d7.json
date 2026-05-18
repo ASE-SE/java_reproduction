@@ -1,0 +1,6 @@
+{
+  "analysis": "The code snippet calls Thread.sleep(75) inside a catch block for SQLException, in the recursive method getNextBlock. Before the call, there is no check for the current thread's interrupted status. The argument is a constant 75, which is not negative. After the call, the catch block catches InterruptedException with an empty handler. Therefore, the condition for IllegalArgumentException (negative millis) is avoided because the argument is fixed at 75. The condition for InterruptedException (thread interruption) is not avoided because no validation prevents the thread from being interrupted before or during the sleep call.",
+  "answer": "IllegalArgumentException: avoided (argument is always 75, non-negative). InterruptedException: not avoided (no check for thread interruption before call).",
+  "result": ["InterruptedException"],
+  "remark": "InterruptedException can be triggered if any thread interrupts the current thread while it is sleeping. The code does not check the interrupted status before calling Thread.sleep(75), so the exception can be thrown despite the empty catch block that handles it."
+}

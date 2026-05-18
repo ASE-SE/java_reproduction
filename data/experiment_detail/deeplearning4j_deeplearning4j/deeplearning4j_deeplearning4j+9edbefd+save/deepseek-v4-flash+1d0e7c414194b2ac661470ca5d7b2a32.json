@@ -1,0 +1,6 @@
+{
+  "analysis": "The code snippet uses a `ZipOutputStream` inside a try-with-resources block. The `close()` method is called explicitly at the end of the try block, and then again automatically by the try-with-resources. This double call can lead to a `ZipException` (since the ZIP stream is already closed) or an `IOException` (e.g., stream closed error). Additionally, the underlying `OutputStream os` is provided by the caller and may be invalid, causing an `IOException` during the final close. There are no checks or validations in the code to prevent these exceptions.",
+  "answer": "ZipException: not avoided; IOException: not avoided",
+  "result": ["ZipException", "IOException"],
+  "remark": "The `ZipException` can be triggered if the `close()` method is called twice (explicit close followed by try-with-resources close) because the ZIP stream will be already closed, causing a ZIP format error. The `IOException` can be triggered if the underlying `OutputStream` is invalid or closed, or if the double close causes a stream closed I/O error."
+}

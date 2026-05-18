@@ -1,0 +1,10 @@
+{
+  "analysis": "The code snippet provided is a method `blockForPending` that waits for all pending `Future` objects to complete. The method uses a `while` loop to continuously check and process each `Future` object in the `_pending` list. The loop exits when there are no more pending futures, as indicated by `_pending_cnt == 0`.\n\nThe `get` method of the `Future` class is called to retrieve the result of the computation. According to the API documentation, `get` can throw the following exceptions:\n- `CancellationException` if the computation was cancelled.\n- `ExecutionException` if the computation threw an exception.\n- `InterruptedException` if the current thread was interrupted while waiting.\n\nIn the provided code, the `InterruptedException` and `ExecutionException` are caught and re-thrown as runtime exceptions using `Log.errRTExcept(e)`. However, the `CancellationException` is not explicitly caught or handled. The code does not perform any checks or validations that would prevent the `CancellationException` from being thrown. Therefore, the `CancellationException` is not avoided in this context.",
+  "answer": {
+    "CancellationException": "The throwing condition is not avoided. The code does not check if the `Future` is cancelled before calling `get`.",
+    "ExecutionException": "The throwing condition is caught and re-thrown as a runtime exception. The code catches `ExecutionException` and handles it by re-throwing it as a runtime exception.",
+    "InterruptedException": "The throwing condition is caught and re-thrown as a runtime exception. The code catches `InterruptedException` and handles it by re-throwing it as a runtime exception."
+  },
+  "result": ["CancellationException"],
+  "remark": "The `CancellationException` is not avoided in the given code context. This exception will be thrown if any of the `Future` objects in the `_pending` list have been cancelled. The `blockForPending` method does not perform any checks to see if a `Future` is cancelled before calling `get`, so if a `Future` is cancelled, the `CancellationException` will be thrown and not caught, leading to an unhandled exception."
+}

@@ -1,0 +1,61 @@
+[12:29:01] waiting for seeker full run to finish...
+[15:05:02] seeker run done. tail of log:
+
+done. wrote 1594 entries to seeker_deepseek-v4-flash_with_detector_raw.json, 0 unrecovered failures, 9576s total.
+next step: python refill.py seeker_deepseek-v4-flash_with_detector_raw.json
+[15:05:02] step 1: build seeker_detector_output.json
+wrote 1594 samples to seeker_detector_output.json
+  changed=1 (detector_fires): 658
+  missing from with-detector (kept AST changed as-is): 0
+[15:05:02] step 2: regen compare.md
+  seeker-detector  0.5258 0.6268 0.5719 0.2994 0.3732 0.6750     346/312/206/730
+  neurex        0.5217 0.0217 0.0417 0.0106 0.9783 0.6543     12/11/540/1031
+  nexgen-原数据集   0.4831 0.2591 0.3373 0.1468 0.7409 0.6474     143/153/409/889
+  nexgen-我们的数据集  0.4885 0.2319 0.3145 0.1286 0.7681 0.6499     128/134/424/908
+
+2. 行级 (不计嵌套, NoNestingLines)  — 仅 label=1 累积
+------------------------------------------------------------------------------
+  method              P       R      F1     FPR     FNR     Acc     TP/FP/FN/TN
+  my            0.2596 0.4879 0.3389 0.2759 0.5121 0.6850     1173/3345/1231/8778
+  seeker        0.2712 0.4046 0.3248 0.2144 0.5954 0.7228     997/2679/1467/9814
+  seeker-detector  0.2712 0.4046 0.3248 0.2144 0.5954 0.7228     997/2679/1467/9814
+  neurex        0.5714 0.0049 0.0097 0.0007 0.9951 0.8355     12/9/2452/12484
+  nexgen-原数据集   0.3528 0.1226 0.1819 0.0443 0.8774 0.8184     302/554/2162/11939
+  nexgen-我们的数据集  0.4191 0.1209 0.1877 0.0331 0.8791 0.8276     298/413/2166/12080
+
+3. 行级 (按 [start,end) 区间)       — 仅 label=1 累积
+------------------------------------------------------------------------------
+  method              P       R      F1     FPR     FNR     Acc     TP/FP/FN/TN
+  my            0.2522 0.5012 0.3356 0.3039 0.4988 0.6630     1236/3665/1230/8396
+  seeker        0.2554 0.4848 0.3346 0.2870 0.5152 0.6745     1224/3568/1301/8864
+  seeker-detector  0.2554 0.4848 0.3346 0.2870 0.5152 0.6745     1224/3568/1301/8864
+  neurex        0.5714 0.0048 0.0094 0.0007 0.9952 0.8314     12/9/2513/12423
+  nexgen-原数据集   0.3453 0.1521 0.2112 0.0586 0.8479 0.8082     384/728/2141/11704
+  nexgen-我们的数据集  0.4100 0.1299 0.1973 0.0380 0.8701 0.8216     328/472/2197/11960
+
+4. TP 子集: 异常类型命中率 (resultExceptionTypes ∩ exceptionTypes 非空)
+------------------------------------------------------------------------------
+  method        matched / total = rate
+  my            126 / 314 = 0.4013
+  seeker        84 / 397 = 0.2116
+  seeker-detector  61 / 346 = 0.1763
+  neurex        1 / 12 = 0.0833
+  nexgen-原数据集   23 / 143 = 0.1608
+  nexgen-我们的数据集  26 / 128 = 0.2031
+
+5. TP 子集: 威胁代码行覆盖 (true_threat=beforeTargetNoNestingLines)
+------------------------------------------------------------------------------
+  method        start_in ≥50%catch full_cov avg_cov     total
+  my            0.7898   0.7866    0.7707   0.8344     314
+  seeker        0.7078   0.7003    0.6700   0.7481     397
+  seeker-detector  0.4769   0.4682    0.4422   0.4915     346
+  neurex        0.9167   0.9167    0.9167   0.9167     12
+  nexgen-原数据集   0.6014   0.6014    0.5734   0.6655     143
+  nexgen-我们的数据集  0.6172   0.6094    0.5703   0.6734     128
+
+说明: start_in=真实 try 起始行落入预测覆盖; ≥50%catch=覆盖率≥0.5 且起始行被包;
+      full_cov=100% 覆盖; avg_cov=所有 TP 样本的平均覆盖率。
+
+
+markdown 写入: data/compare.md
+[15:05:02] FULL_PIPELINE_DONE

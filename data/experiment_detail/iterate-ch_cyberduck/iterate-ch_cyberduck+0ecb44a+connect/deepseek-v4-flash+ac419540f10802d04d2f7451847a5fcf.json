@@ -1,0 +1,8 @@
+{
+  "analysis": "The code snippet shows a call to `removeHandshakeCompletedListener(this)` inside the `handshakeCompleted` method of an anonymous `HandshakeCompletedListener`. The listener is registered via `addHandshakeCompletedListener(listener)` immediately before `initStreams()`. The API documentation declares only `IllegalArgumentException` for two conditions: (1) listener is null, (2) listener is not registered. In this context, `this` refers to the non-null listener instance, and the listener has just been registered on the same `SSLSocket` before the handshake completes. Therefore, both conditions are avoided. No other exceptions are declared, so no unchecked exceptions are considered. The call is safe in this context.",
+  "answer": {
+    "IllegalArgumentException": "avoided"
+  },
+  "result": [],
+  "remark": "The `IllegalArgumentException` is not thrown because the listener argument (`this`) is non-null and has been previously registered via `addHandshakeCompletedListener`. The handshake completion event occurs after registration, so the listener is still registered at the time `removeHandshakeCompletedListener` is called. No other exceptions are declared, and the code does not introduce any other potential failure conditions."
+}

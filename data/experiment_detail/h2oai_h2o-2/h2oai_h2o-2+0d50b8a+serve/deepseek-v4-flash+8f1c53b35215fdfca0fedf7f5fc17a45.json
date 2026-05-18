@@ -1,0 +1,8 @@
+[
+{
+  "analysis": "The method `replace(String what, Object with)` first checks if the first character of `what` is '$'. If true, it immediately throws a RuntimeException with a message indicating that '$' is now a control character for URL encoding. This is an unconditional guard clause. The method then proceeds to replace placeholders: first for the exact `what`, and then for `\"$\" + what` to apply URL encoding. The throw prevents using a placeholder name that starts with '$', because that would conflict with the automatic URL encoding applied to placeholders prefixed with '$'. The RuntimeException is unchecked, and the programmer likely introduced it to catch programming errors at development time rather than expecting callers to handle it gracefully.",
+  "answer": "The programmer did not expect the thrown runtime exception to be caught externally. The exception is thrown as a guard to enforce business rules (preventing placeholder names beginning with '$'), indicating a misuse of the API. It is meant to propagate up and alert the developer to fix the input, not to be handled by a caller.",
+  "result": "no catch",
+  "remark": "The exception is thrown when the 'what' parameter starts with '$', because the '$' character is reserved for indicating URL-encoded placeholders. The programmer intends for this to be a programming error that should be avoided by ensuring 'what' does not start with '$'. Therefore, it is not meant to be caught by external code; instead, the caller should ensure that placeholder names do not begin with '$'."
+}
+]

@@ -1,0 +1,6 @@
+{
+  "analysis": "The code snippet contains a call to `BigDecimal.valueOf(((Number)value).doubleValue())` in the NUMERIC case when `value instanceof Double || value instanceof Float`. The `doubleValue()` method returns the primitive double value of the Number. `BigDecimal.valueOf(double)` throws `NumberFormatException` if the double value is infinite or NaN. The `instanceof` check only ensures that `value` is a Double or Float, but does not check for special floating-point values like NaN or infinity. No further validation (e.g., `Double.isFinite()`) is performed before the call. Therefore, the throwing condition for `NumberFormatException` is not avoided in this context.",
+  "answer": "NumberFormatException is NOT avoided.",
+  "result": ["NumberFormatException"],
+  "remark": "If `value` is a `Double` or `Float` that holds `NaN` (e.g., `Double.NaN`) or infinity (e.g., `Double.POSITIVE_INFINITY`), then `BigDecimal.valueOf` will throw `NumberFormatException` because these special floating-point values cannot be converted to a valid `BigDecimal` via the canonical string representation."
+}

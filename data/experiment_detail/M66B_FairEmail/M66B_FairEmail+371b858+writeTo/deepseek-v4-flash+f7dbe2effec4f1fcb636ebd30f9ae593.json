@@ -1,0 +1,10 @@
+{
+  "analysis": "The method `charsetForMime` processes a name string through various transformations and then calls `Charset.forName(jname)`. Before the call, it ensures `name` is not null (set to empty string if null) and performs sanitization like removing quotes, normalizing, removing non-ASCII, trimming, and converting to uppercase. It also has early returns for many common charset names. However, after these steps, the variable `jname` is obtained from `MimeUtility.javaCharset(name)` without any null check. If `MimeUtility.javaCharset` returns null, then `Charset.forName` will throw `IllegalArgumentException`. The sanitization does not validate whether `jname` is a legal charset name or whether it is supported by the JVM, so `IllegalCharsetNameException` and `UnsupportedCharsetException` can still occur. The code catches `Throwable` after the call, but the throwing conditions themselves are not fully avoided.",
+  "answer": "IllegalArgumentException: Not fully avoided because `jname` could be null if `MimeUtility.javaCharset` returns null.\nIllegalCharsetNameException: Not avoided because the code does not validate that `jname` is a legal charset name.\nUnsupportedCharsetException: Not avoided because the code does not guarantee that the charset is supported by the JVM.",
+  "result": [
+    "IllegalArgumentException",
+    "IllegalCharsetNameException",
+    "UnsupportedCharsetException"
+  ],
+  "remark": "IllegalArgumentException can be triggered if `MimeUtility.javaCharset` returns null (the null check on `name` does not cover this). IllegalCharsetNameException can be triggered if `jname` is not a legal charset name (e.g., contains illegal characters). UnsupportedCharsetException can be triggered if `jname` refers to a charset that is not available in the current JVM instance."
+}

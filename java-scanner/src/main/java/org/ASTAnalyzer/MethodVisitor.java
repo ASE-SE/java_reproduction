@@ -35,12 +35,12 @@ public class MethodVisitor extends ASTVisitor{
 		// 函数中try-block拆解
 		if (node.getParent() instanceof TryStatement){
 			// 在finally块也会进入，需要排除
-//			System.out.println("try-nesting: " + tryNesting);
-//			System.out.println(parent.resources());
-//			System.out.println(parent.getBody());
-//			System.out.println(parent.catchClauses());
-//			System.out.println(parent.getFinally());
 			TryBlock tb = new TryBlock((TryStatement) node.getParent(), this.methodBlock);
+			// 若 TryBlock 无法在 methodBlock 中定位（嵌于匿名类内、JDT 输出格式偏移等），
+			// 静默跳过，不让单个 try 定位失败导致整个方法判定失效
+			if (!tb.isLocated()) {
+				return true;
+			}
 			boolean duplicate = false;
 			for (TryBlock tryBlock : tryBlocks) {
 				if (tb.equals(tryBlock)) {

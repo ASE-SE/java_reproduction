@@ -1,0 +1,9 @@
+{
+  "analysis": "The code snippet defines a method `log` that, after some checks, builds an `EntityLog` and submits a `Runnable` via `Helper.getSerialExecutor().submit()`. The API documentation for `submit` states it can throw `RejectedExecutionException` if the task cannot be scheduled, or `NullPointerException` if the task is null. In the snippet, the task is a newly created anonymous `Runnable`, so it is never null – thus `NullPointerException` is avoided. There is no prior validation that the executor is capable of accepting the task; no check for shutdown, queue capacity, or other rejection conditions. Therefore, `RejectedExecutionException` is NOT avoided.",
+  "answer": {
+    "RejectedExecutionException": "NOT avoided",
+    "NullPointerException": "avoided"
+  },
+  "result": ["RejectedExecutionException"],
+  "remark": "`RejectedExecutionException` can be thrown if the executor (returned by `Helper.getSerialExecutor()`) is unable to schedule the task. This can happen if the executor has been shut down, its work queue is full, or it is in a state that prevents acceptance of new tasks. The code does not perform any pre‑call checks (e.g., verifying executor liveness or queue capacity) to avoid this exception."
+}

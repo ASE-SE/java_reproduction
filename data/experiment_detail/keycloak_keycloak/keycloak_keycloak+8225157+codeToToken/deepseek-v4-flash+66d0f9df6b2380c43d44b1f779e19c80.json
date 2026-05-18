@@ -1,0 +1,11 @@
+{
+  "analysis": "The method `detail` first checks if `value` is null or empty, returning early if so, thus ensuring `value` is non-null and non-empty before the `put` call. It then ensures `event.getDetails()` is initialized to a new `HashMap` if null, but if it is not null, it could be any `Map<String,String>` implementation (e.g., unmodifiable map, map that does not permit null keys, etc.). The `key` parameter is never validated, so it could be null or have other properties. The `put` call is made without any additional checks on the map's behavior or the key. Therefore, only the `NullPointerException` condition for value being null is avoided; all other exception conditions remain possible depending on the actual map implementation.",
+  "answer": {
+    "UnsupportedOperationException": "not avoided",
+    "ClassCastException": "not avoided",
+    "NullPointerException": "not avoided",
+    "IllegalArgumentException": "not avoided"
+  },
+  "result": ["UnsupportedOperationException", "ClassCastException", "NullPointerException", "IllegalArgumentException"],
+  "remark": "All four exceptions remain possible in the calling context:\n- **UnsupportedOperationException**: If the map returned by `event.getDetails()` does not support the `put` operation (e.g., an unmodifiable map).\n- **ClassCastException**: If the class of `key` or `value` prevents storage (e.g., if the map expects specific types incompatible with String).\n- **NullPointerException**: If `key` is null and the map does not permit null keys (only value null is avoided by the initial check).\n- **IllegalArgumentException**: If some property of `key` or `value`, such as an empty key, prevents storage (the value check only avoids empty string, not other invalid properties)."
+}

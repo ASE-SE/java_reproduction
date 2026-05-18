@@ -1,0 +1,8 @@
+[
+{
+  "analysis": "The method `setProperty` first checks if the `name` argument is null and returns false in that case. Then it checks if the name contains characters that would be escaped by `StringEscapeUtils.escapeXml10`. If the name is not equal to its escaped version, it throws an `IllegalArgumentException` with the message 'Property name cannot contain XML entities.' This is a runtime exception. The remainder of the method proceeds to parse the property name, update an XML document, and save properties. The throw occurs as a precondition check: the programmer considers a name containing XML entities to be an invalid input that should never happen if the caller provides a proper property name. Unlike the null case which is handled by returning false (a graceful degradation), the XML entity case triggers an unchecked exception, indicating it is considered a programming error rather than a recoverable condition. The method's documentation does not mention this exception, further suggesting it is not intended to be caught explicitly by callers but rather to fail fast during development.",
+  "answer": "The programmer did not expect this runtime exception to be caught and handled by the caller; it is intended to signal a programming error.",
+  "result": "no catch",
+  "remark": "The exception is thrown when the property name contains characters that would be XML-escaped, making it invalid for use as an XML property name. The programmer treats this as a severe error that should not occur if the caller provides a valid name, hence an unchecked exception is used without expectation of being caught. The caller is expected to ensure the name is free of XML entities before calling this method."
+}
+]

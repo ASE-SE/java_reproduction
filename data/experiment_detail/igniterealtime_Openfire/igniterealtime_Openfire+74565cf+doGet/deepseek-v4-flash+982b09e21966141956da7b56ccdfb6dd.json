@@ -1,0 +1,6 @@
+{
+  "analysis": "The code snippet calls `URLDecoder.decode(queryString, \"UTF-8\")`. According to the javadoc, `decode` can throw `UnsupportedEncodingException` if the named encoding is not supported, and `IllegalArgumentException` if malformed escape sequences are encountered. In the context, the encoding name is hardcoded as \"UTF-8\", which is universally supported in Java, so `UnsupportedEncodingException` is effectively avoided. However, the `queryString` comes from `request.getQueryString()` without any validation for malformed percent-encoding (e.g., %XY with invalid hex digits). Therefore, `IllegalArgumentException` can still be thrown if the input contains malformed escape sequences.",
+  "answer": "UnsupportedEncodingException: avoided (UTF-8 is always supported). IllegalArgumentException: not avoided (malformed escape sequences possible from user input).",
+  "result": ["IllegalArgumentException"],
+  "remark": "The IllegalArgumentException is thrown when the query string contains malformed percent-encoded sequences (e.g., %XY where X or Y is not a valid hexadecimal digit). The calling code does not validate or sanitize the query string before decoding, so this exception can be triggered by a malicious or malformed request."
+}

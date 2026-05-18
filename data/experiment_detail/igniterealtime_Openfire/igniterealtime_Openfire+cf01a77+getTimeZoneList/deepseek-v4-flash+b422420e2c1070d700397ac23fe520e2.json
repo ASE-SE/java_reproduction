@@ -1,0 +1,11 @@
+{
+  "analysis": "The code snippet is a synchronized method `getProperty` that retrieves a property from an XML document and caches it. The call to `propertyCache.put(name, value)` occurs only when `value` is a non-empty string (since the else branch is taken only if `\"\".equals(value)` is false, meaning `value` is not empty, so it's non-null). The `name` parameter is not validated for null. The map `propertyCache` is not explicitly typed, but its usage implies it is a `Map<String, String>`. The documented exceptions for `put` are analyzed against the calling context:\n- UnsupportedOperationException: thrown if the map does not support `put`. The code calls `put` expecting it to work, but if the map were unmodifiable, this could occur. There is no check for this, so it is not avoided.\n- ClassCastException: thrown if the key or value type is incompatible. Both `name` (String) and `value` (String) are compatible with a typical Map<String, String>. This exception is avoided.\n- NullPointerException: thrown if key or value is null and the map does not permit null keys/values. `value` is guaranteed non-null. `name` could be null (no null check), so if the map does not permit null keys, this exception would occur. It is not avoided.\n- IllegalArgumentException: thrown if some property of key or value prevents storage (e.g., invalid key format). No validation is performed on `name` or `value` before the call, so this exception is not avoided.",
+  "answer": {
+    "UnsupportedOperationException": "not avoided",
+    "ClassCastException": "avoided",
+    "NullPointerException": "not avoided",
+    "IllegalArgumentException": "not avoided"
+  },
+  "result": ["UnsupportedOperationException", "NullPointerException", "IllegalArgumentException"],
+  "remark": "The exceptions that are NOT avoided in the calling context:\n- UnsupportedOperationException: triggered if `propertyCache` is an unmodifiable map that does not support the `put` operation.\n- NullPointerException: triggered if `name` is `null` and the `propertyCache` map does not permit null keys.\n- IllegalArgumentException: triggered if `name` or `value` has a property (e.g., invalid format, length, or content) that violates the constraints of the specific map implementation."
+}

@@ -1,0 +1,9 @@
+{
+  "analysis": "The code snippet defines a method `getConfig(String name)` that first checks `configs.containsKey(name)`. If true, it calls `configs.get(name)`. The `get` method's documentation declares two exceptions: `ClassCastException` and `NullPointerException`, both optional (implementation-dependent). The `containsKey` call precedes `get`; if the map implementation throws these exceptions for invalid or null keys, `containsKey` will throw them before `get` is executed. For maps that permit null keys, `get(null)` is safe; for those that do not, `containsKey(null)` throws. Similarly, for type issues, `containsKey` would detect an inappropriate key first. Thus, the conditions under which `get` itself could throw these exceptions are avoided by the prior check. The outer try-catch is unrelated to the `get` call.",
+  "answer": {
+    "ClassCastException": "avoided",
+    "NullPointerException": "avoided"
+  },
+  "result": [],
+  "remark": "The `containsKey` check runs before `get`, and if the map implementation would reject the key (null or inappropriate type) for `get`, it also rejects it for `containsKey`. Hence, `get` never receives a key that would cause its declared exceptions; the exceptions would be thrown earlier by `containsKey`. Therefore, both exceptions are avoided in the context of the `get` call."
+}

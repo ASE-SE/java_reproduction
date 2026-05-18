@@ -53,20 +53,36 @@ public class Util {
     private static final Pattern declarationAssignmentPattern = Pattern.compile("^[\\s\t]*(\\w+)\\s+(\\w+)\\s*=\\s*.*;\\s*$");
     private static final Pattern tryWithResourcePattern = Pattern.compile("^[\\s\t]*try\\s*\\((.*)\\)\\s*\\{\\s*$");
     public static boolean isLineMatch(String oldLine, String newLine) {
+        if (isLineMatchPrimary(oldLine, newLine)) return true;
+        // fallback: 全空白去除后字符严格相等。对仅有缩进/连续空白/操作符两侧空白差异的行有效，
+        // 保留字面量与标识符完整性以避免假阳。
+        return isLineMatchNoWhitespace(oldLine, newLine);
+    }
+
+    private static boolean isLineMatchPrimary(String oldLine, String newLine) {
         Matcher declarationAssignmentMatcher = declarationAssignmentPattern.matcher(oldLine);
         Matcher tryWithResourceMatcher = tryWithResourcePattern.matcher(newLine);
         if (declarationAssignmentMatcher.matches()) {
             String withoutType = oldLine.replaceAll((declarationAssignmentMatcher.group(1) + " "), "");
             return (isLineMatchWithoutIndentation(oldLine, newLine)
                     || isLineMatchWithoutIndentation(withoutType, newLine)
-                    || isLineMatch(withoutType, newLine));
+                    || isLineMatchPrimary(withoutType, newLine));
         } else if (tryWithResourceMatcher.matches()) {
             String resourceAssignment = tryWithResourceMatcher.group(1);
             return (isLineMatchWithoutIndentation(oldLine, newLine)
                     || isLineMatchWithoutIndentation(oldLine, resourceAssignment)
-                    || isLineMatch(oldLine, resourceAssignment));
+                    || isLineMatchPrimary(oldLine, resourceAssignment));
         }
         return isLineMatchWithoutIndentation(oldLine, newLine);
+    }
+
+    private static boolean isLineMatchNoWhitespace(String oldLine, String newLine) {
+        String l1 = oldLine.replaceAll("\\s+", "");
+        String l2 = newLine.replaceAll("\\s+", "");
+        if (l1.length() <= 2 || l2.length() <= 2) return false;
+        // 至少包含一个字母或数字，避免纯符号行（如 "{" "}" "})"）被错误聚合
+        if (!l1.matches(".*[A-Za-z0-9].*") || !l2.matches(".*[A-Za-z0-9].*")) return false;
+        return l1.equals(l2);
     }
 
     public static boolean isLineMatchWithoutIndentation(String l1, String l2){

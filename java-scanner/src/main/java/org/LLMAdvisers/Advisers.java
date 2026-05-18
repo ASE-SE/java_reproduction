@@ -96,24 +96,30 @@ public class Advisers {
         sb.append(promptTemplates.get(QUESTION));
         sb.append(promptTemplates.get(INPUT_FORMAT));
         sb.append("\n");
-        sb.append("<代码片段>\n");
+        sb.append("<code snippet>\n");                                    // 中文：<代码片段>
         sb.append("```\n").append(root.getCode()).append("\n```\n");
         sb.append("<end>\n\n");
         int i = 1;
         for (UncaughtExceptionInfo uei: exceptionResults) {
-            sb.append("<函数调用 ").append(i).append(">\n");
+            sb.append("<call ").append(i).append(">\n");                  // 中文：<函数调用 N>
             if (uei instanceof UncaughtExceptionInfoAPI) {
-                sb.append("代码片段中的函数：").append(uei.getNodeRoute().get(1).getSimpleName()).append("\n");
-                sb.append("在经过").append(uei.getNodeRoute().size() - 1).append("重调用后，最终在函数:").append(uei.getMethodTreeNode().getSimpleName()).append("中\n");
-                sb.append("可能抛出运行时异常:").append(uei.getCheckedUncaughtExceptionsString()).append("\n");
+                // 中文：代码片段中的函数：<simpleName>
+                sb.append("Function in snippet: ").append(uei.getNodeRoute().get(1).getSimpleName()).append("\n");
+                // 中文：在经过 N 重调用后，最终在函数:<simpleName>中
+                sb.append("After ").append(uei.getNodeRoute().size() - 1).append(" levels of call, in function: ").append(uei.getMethodTreeNode().getSimpleName()).append("\n");
+                // 中文：可能抛出运行时异常:<exceptions>
+                sb.append("May throw runtime exceptions: ").append(uei.getCheckedUncaughtExceptionsString()).append("\n");
             } else if (uei instanceof UncaughtExceptionInfoThrow && uei.getNodeRoute().size() > 1) {
-                sb.append("代码片段中的函数：").append(uei.getNodeRoute().get(1).getSimpleName()).append("\n");
-                sb.append("在经过").append(uei.getNodeRoute().size() - 1).append("重调用后，使用throw语句`").append(((UncaughtExceptionInfoThrow) uei).getCheckedUncaughtThrowExceptionInfo()).append("`抛出异常\n");
+                // 中文：代码片段中的函数：<simpleName>
+                sb.append("Function in snippet: ").append(uei.getNodeRoute().get(1).getSimpleName()).append("\n");
+                // 中文：在经过 N 重调用后，使用throw语句`<stmt>`抛出异常
+                sb.append("After ").append(uei.getNodeRoute().size() - 1).append(" levels of call, the throw statement `").append(((UncaughtExceptionInfoThrow) uei).getCheckedUncaughtThrowExceptionInfo()).append("` throws an exception\n");
             }
             if (uei.hasDescription()) {
-                sb.append("异常说明：").append(uei.getDescription()).append("\n");
+                // 中文：异常说明：<desc>
+                sb.append("Exception description: ").append(uei.getDescription()).append("\n");
             }
-            sb.append("<end ").append(i).append(">\n");
+            sb.append("<end ").append(i).append(">\n");                   // 中文：<end N>
             i++;
         }
         return sb.toString();
@@ -182,10 +188,10 @@ public class Advisers {
         sb.append(promptTemplates.get(API_QUESTION).replaceAll("\\{str1\\}", Matcher.quoteReplacement(uncaughtExceptionInfo.getMethodTreeNode().getSimpleName())));
         sb.append(promptTemplates.get(API_FORMAT));
         sb.append("\n");
-        sb.append("<代码片段>\n");
+        sb.append("<code snippet>\n");                                    // 中文：<代码片段>
         sb.append("```\n").append(uncaughtExceptionInfo.getSecondLastNode().getCode()).append("\n```\n");
         sb.append("<end>\n\n");
-        sb.append("<api方法文档>\n");
+        sb.append("<api javadoc>\n");                                     // 中文：<api方法文档>
         sb.append(((ArchivedMethodTreeNode) uncaughtExceptionInfo.getMethodTreeNode()).getJavaDoc());
         sb.append("<end>\n\n");
         return sb.toString();
@@ -236,7 +242,7 @@ public class Advisers {
         sb.append(promptTemplates.get(THROW_QUESTION).replaceAll("\\{str1\\}", Matcher.quoteReplacement(uncaughtExceptionInfo.getUncaughtThrowExceptionInfo().get(index).getThrowStatementString())));
         sb.append(promptTemplates.get(THROW_FORMAT).replaceAll("\\{str1\\}", Matcher.quoteReplacement(uncaughtExceptionInfo.getUncaughtThrowExceptionInfo().get(index).getThrowStatementString())));
         sb.append("\n");
-        sb.append("<代码片段>\n");
+        sb.append("<code snippet>\n");                                    // 中文：<代码片段>
         sb.append("```\n").append(uncaughtExceptionInfo.getMethodTreeNode().getCode()).append("\n```\n");
         sb.append("<end>\n\n");
         return sb.toString();
@@ -407,7 +413,7 @@ public class Advisers {
         sb.append(promptTemplates.get(QUESTION));
         sb.append(promptTemplates.get(BASELINE_INPUT_FORMAT));
         sb.append("\n");
-        sb.append("<代码片段>\n");
+        sb.append("<code snippet>\n");                                    // 中文：<代码片段>
         sb.append("```\n").append(methodText).append("\n```\n");
         sb.append("<end>\n\n");
         return sb.toString();

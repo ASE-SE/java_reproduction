@@ -1,0 +1,6 @@
+{
+  "analysis": "The code snippet calls `sender.substring(at + 1)` where `sender` is a non-null, non-empty String obtained from an email address. The variable `at` is the index of '@' in `sender`, and it is only used if `at > 0`, ensuring that `at` is at least 1. Since `at` is the index of '@', it must be less than the length of `sender`. Therefore, beginIndex = at + 1 is between 2 and length (inclusive of length when '@' is the last character). The documentation states that `IndexOutOfBoundsException` is thrown if beginIndex is negative or larger than the length. Neither condition holds due to the checks: beginIndex is positive and not larger than length (since at < length, at+1 <= length). Thus the exception is avoided by the prior validation.",
+  "answer": "IndexOutOfBoundsException: avoided.",
+  "result": [],
+  "remark": "The call `sender.substring(at + 1)` cannot throw IndexOutOfBoundsException because:\n- `sender` is guaranteed non-null and non-empty by the check `TextUtils.isEmpty(sender)`.\n- `at` is the index of '@' only if `at > 0`, so `at` is at least 1.\n- Since `at` is a valid index in the string (the '@' character exists), the condition `at < sender.length()` holds, so `at + 1 <= sender.length()`. The beginIndex is therefore always within the range [0, length] inclusive, which is valid for substring. No exception can occur."
+}

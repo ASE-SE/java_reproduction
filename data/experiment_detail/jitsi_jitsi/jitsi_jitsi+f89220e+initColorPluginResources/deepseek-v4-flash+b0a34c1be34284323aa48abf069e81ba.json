@@ -1,0 +1,11 @@
+{
+  "analysis": "The code calls `resources.put(key, value)` where `resources` is a `Map<String, String>` passed as a parameter. The keys and values come from a `ResourceBundle` and are both `String` objects. The documentation of `put` declares four exceptions. The context does not guarantee that the map implementation supports the `put` operation (optional), so `UnsupportedOperationException` may occur. Since keys and values are strictly `String`, `ClassCastException` is avoided due to type consistency. Both key and value are non-null (keys from `getKeys()` are never null; values from `getString()` return non-null strings or throw `MissingResourceException`), so `NullPointerException` is avoided. `IllegalArgumentException` could be thrown if the map implementation rejects certain string properties; this is not avoided as the map implementation is unknown.",
+  "answer": {
+    "UnsupportedOperationException": "not avoided",
+    "ClassCastException": "avoided",
+    "NullPointerException": "avoided",
+    "IllegalArgumentException": "not avoided"
+  },
+  "result": ["UnsupportedOperationException", "IllegalArgumentException"],
+  "remark": "`UnsupportedOperationException` can be thrown if the `resources` map is unmodifiable (e.g., created via `Collections.unmodifiableMap()`). `IllegalArgumentException` may be thrown if the map implementation imposes restrictions on the key or value content (e.g., a custom map that disallows certain string patterns). Both exceptions are not guaranteed to be avoided by the code context."
+}

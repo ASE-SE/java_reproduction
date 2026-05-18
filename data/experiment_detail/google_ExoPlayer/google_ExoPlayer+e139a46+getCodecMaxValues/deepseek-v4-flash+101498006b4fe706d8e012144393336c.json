@@ -1,0 +1,6 @@
+{
+  "analysis": "The code snippet uses a Matcher obtained from PROFILE_PATTERN.matcher(parts[1]). It then calls matcher.matches() and only proceeds if the match is successful. After that, it calls matcher.group(1). According to the API documentation, group(int) throws IllegalStateException if no match has been attempted or the previous match failed, and IndexOutOfBoundsException if the specified capturing group does not exist in the pattern. Since matcher.matches() was called and returned true, the match has been attempted and succeeded, so IllegalStateException is avoided. However, there is no check to ensure that the pattern actually has a capturing group with index 1, so if PROFILE_PATTERN does not have at least one capturing group, the call to group(1) will throw IndexOutOfBoundsException. Therefore, IndexOutOfBoundsException is not avoided.",
+  "answer": "IllegalStateException: Avoided (because matcher.matches() was called and succeeded). IndexOutOfBoundsException: Not avoided (no validation that the pattern contains group 1).",
+  "result": ["IndexOutOfBoundsException"],
+  "remark": "If PROFILE_PATTERN does not contain at least one capturing group (i.e., no group with index 1), then calling matcher.group(1) will throw IndexOutOfBoundsException regardless of the successful match."
+}

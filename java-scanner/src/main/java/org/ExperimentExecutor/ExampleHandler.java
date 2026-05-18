@@ -35,8 +35,11 @@ public class ExampleHandler {
     private static Map<String, Set<String>> experimentDataFiles = new HashMap<>(); // 与EXPERIMENT_DATA_PATH中文件同步，记录文件夹与文件名
 
     public static final boolean LOAD_FINAL_RESULT = false;
-    public static final String EXPERIMENT_FINAL_RESULT_PATH = "D:\\Workspace\\uncaught exception\\data\\experiment_result_cleanE0502.json";
-    public static final String LLM_BASELINE_OUTPUT_PATH = "D:\\Workspace\\uncaught exception\\data\\experiment_result_clean-blllmE0507.json";
+    // Used only by LLMExperiment baseline (when LOAD_FINAL_RESULT=true). Points to the same
+    // sample set the main pipeline reads, so the LLM-only baseline runs on identical inputs.
+    // Relative to java-scanner/ working directory (cwd at launch).
+    public static final String EXPERIMENT_FINAL_RESULT_PATH = "../data/1594_input_data.json";
+    public static final String LLM_BASELINE_OUTPUT_PATH = "../data/E0502_llm_baseline_output.json";
     private static List<ExampleData> rawFinalResultData;
     private static List<ExampleData> rawLLMResultData;
 

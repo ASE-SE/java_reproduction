@@ -1,0 +1,8 @@
+{
+  "analysis": "The code snippet calls the `substring` method twice. The first call is `line.substring(0, line.indexOf(\" \")).trim();` and the second call is `line.substring(line.indexOf(\" \") + 1).trim();`. The `substring` method as per the Javadoc throws an `IndexOutOfBoundsException` if the `beginIndex` is negative, or `endIndex` is larger than the length of the `String` object, or `beginIndex` is larger than `endIndex`. In the given code, there are no explicit checks to validate the `beginIndex` and `endIndex` before calling `substring`. However, the code does check if the `line` is not empty and if it contains a space, which implicitly avoids the `IndexOutOfBoundsException` for the first `substring` call, as `indexOf(\" \")` will not return a negative value if the line contains a space. For the second `substring` call, the `indexOf(\" \") + 1` might go out of bounds if the space is the last character in the line. This scenario is not explicitly checked, and thus, the `IndexOutOfBoundsException` is not fully avoided.",
+  "answer": {
+    "IndexOutOfBoundsException": "Not avoided"
+  },
+  "result": ["IndexOutOfBoundsException"],
+  "remark": "The `IndexOutOfBoundsException` can be triggered in the second `substring` call if the last character of the line is a space. In this case, `line.indexOf(\" \") + 1` will be equal to the length of the line, and `substring` will throw an `IndexOutOfBoundsException` because the `endIndex` is larger than the length of the `String` object. This exception is not avoided by the current checks in the code."
+}

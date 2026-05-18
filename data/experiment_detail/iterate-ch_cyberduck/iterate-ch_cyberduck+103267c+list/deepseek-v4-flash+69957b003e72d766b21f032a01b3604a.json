@@ -1,0 +1,6 @@
+{
+  "analysis": "The code snippet calls `factories.get(NATIVE_PLATFORM)` after checking that the key exists in the map via `containsKey`. The API documentation for `Map.get` declares two possible exceptions: ClassCastException (if the key is of an inappropriate type) and NullPointerException (if the key is null and the map does not permit null keys). In the calling context, `NATIVE_PLATFORM` is a constant that is unlikely to be null, so NullPointerException is avoided. For ClassCastException, the `containsKey` check uses the same key; if the key type were incompatible, `containsKey` would throw a ClassCastException before `get` is called. Therefore, if execution reaches `get`, the key is already validated to be of an appropriate type, so ClassCastException is also avoided. Thus, both exceptions are avoided.",
+  "answer": "ClassCastException: avoided; NullPointerException: avoided.",
+  "result": [],
+  "remark": "The only exceptions declared for `Map.get` are ClassCastException and NullPointerException. In this context, the key `NATIVE_PLATFORM` is a constant and non-null, so NullPointerException is avoided. The prior `containsKey` call with the same key would throw ClassCastException if the key type were incompatible, preventing the `get` call from encountering that scenario. Thus, neither exception occurs from this `get` invocation."
+}

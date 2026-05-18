@@ -1,0 +1,6 @@
+{
+  "analysis": "The code snippet calls `propertyUrl.getPath().substring(1)`. The API documentation for `String.substring(int beginIndex)` states it throws `IndexOutOfBoundsException` if `beginIndex` is negative or larger than the length of the string. The context does not include any precondition checks on the length or emptiness of `propertyUrl.getPath()`. The `getPath()` method of `URL` can return an empty string (if the URL has no path) or a string starting with a '/'. While typically the path from `findEntries` will start with a '/' and have at least length 1, there is no guarantee. Therefore, the throwing condition for `IndexOutOfBoundsException` (when `beginIndex > length`) is not avoided.",
+  "answer": "IndexOutOfBoundsException: not avoided",
+  "result": ["IndexOutOfBoundsException"],
+  "remark": "The `IndexOutOfBoundsException` can be triggered if `propertyUrl.getPath()` returns a string whose length is less than 1 (i.e., an empty string). In that case, `substring(1)` has a `beginIndex` greater than the string length, causing the exception. The code does not validate the length of the path before calling `substring(1)`, so this scenario is not prevented."
+}

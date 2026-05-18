@@ -1,0 +1,6 @@
+{
+  "analysis": "The method `getIntProperty` retrieves a property as a string using `properties.getProperty(key)`. If the string is non-null and has text (checked via `StringUtils.hasText(value)`), it calls `Integer.parseInt(value)`. According to the documentation, `parseInt` only throws `NumberFormatException` when the string does not represent a parsable integer. The `hasText` check ensures that `value` is not null, not empty, and contains at least one non-whitespace character. However, this check does not validate whether the string is a valid integer format (e.g., it may contain non-digit characters, extra signs, or exceed the int range). Therefore, `NumberFormatException` is not fully avoided; it can still occur if `value` is a non-blank string that is not a valid integer.",
+  "answer": "NumberFormatException: not avoided",
+  "result": ["NumberFormatException"],
+  "remark": "The `StringUtils.hasText(value)` check avoids calls to `parseInt` when the value is null, empty, or only whitespace. However, it does not validate integer format. Consequently, `NumberFormatException` will be thrown if the value is a non-blank string that cannot be parsed as an integer, such as \"abc\", \"12.34\", \"\", or a value outside the int range."
+}

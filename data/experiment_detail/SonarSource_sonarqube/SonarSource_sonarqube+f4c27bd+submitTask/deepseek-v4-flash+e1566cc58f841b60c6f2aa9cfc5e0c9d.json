@@ -1,0 +1,8 @@
+[
+{
+  "analysis": "The method submitTask submits a Callable to an executorService. Inside the call() method, an SVN blame command is executed. If the exit code is not 0, an IllegalStateException is thrown. This exception is caught by the executor and stored in the Future object returned. When the caller of submitTask gets the Future and calls get(), an ExecutionException will be thrown with the IllegalStateException as its cause. Therefore, the programmer expects that the caller will handle this failure by catching ExecutionException when retrieving the result.",
+  "answer": "Yes, the programmer expected the thrown runtime exception to be caught and handled by the caller.",
+  "result": "should catch",
+  "remark": "The IllegalStateException is thrown when the SVN blame command fails (exit code != 0). It is thrown inside a Callable submitted to an executor service. The exception will be wrapped in a java.util.concurrent.ExecutionException when the caller invokes Future.get(). Thus, the caller is expected to catch ExecutionException and examine the cause to handle the failure appropriately."
+}
+]
