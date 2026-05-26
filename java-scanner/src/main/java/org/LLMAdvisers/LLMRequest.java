@@ -15,10 +15,13 @@ public class LLMRequest {
     private Object stop = null;
     private boolean stream = false;
     private Object stream_options = null;
-    private double temperature = 0.5;
+    private double temperature = 0;
     private double top_p = 1;
     private Object tools = null;
-    private String tool_choice = "none";
+    // null → Gson 省略该字段。不带 tools 时必须省略 tool_choice,
+    // 否则 qwen3-max(dashscope) 报 400: "When using tool_choice, tools must be set"。
+    // deepseek 等对省略它无影响(无 tools 本就不会调工具)。
+    private String tool_choice = null;
     private boolean logprobs = false;
     private Integer top_logprobs = null;
 

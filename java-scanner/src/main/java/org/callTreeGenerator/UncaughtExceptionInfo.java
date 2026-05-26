@@ -17,6 +17,7 @@ public class UncaughtExceptionInfo {
     protected List<MethodTreeNode> nodeRoute;
     protected Set<String> uncaughtExceptions; // 由静态分析得到的，与路径匹配的未被捕获Runtime异常
     protected Set<String> checkedUncaughtExceptions = null; // 借助LLM判断，得到的需关注的未被捕获Runtime异常，包含于uncaughtExceptions
+    protected java.util.Map<String, Double> checkedExceptionScores = new java.util.HashMap<>(); // 全限定名 -> triage 单分(可达性+危害综合)
     protected String description = null; // 借助LLM得到的对该未捕获异常的描述
 
     public UncaughtExceptionInfo(MethodTreeNode methodTreeNode, List<MethodTreeNode> nodeRoute, Set<String> uncaughtExceptions) {
@@ -80,6 +81,30 @@ public class UncaughtExceptionInfo {
             sb.append(e).append(", ");
         }
         return sb.substring(0, sb.length() - 2);
+    }
+
+    public void setCheckedExceptionScores(java.util.Map<String, Double> scores) {
+        this.checkedExceptionScores = (scores == null) ? new java.util.HashMap<>() : scores;
+    }
+
+    /**
+     * 与 getCheckedUncaughtExceptionsString 类似，但每个异常后附带 triage 单分(可达性+危害综合):
+     *   java.lang.IndexOutOfBoundsException (score 0.90), java.io.IOException (score 0.60)
+     * 无分数(解析失败兜底保留全部时)则只显示名字。
+     */
+    public String getCheckedUncaughtExceptionsScoredString() {
+        Set<String> shown = (checkedUncaughtExceptions == null || checkedUncaughtExceptions.isEmpty())
+                ? uncaughtExceptions : checkedUncaughtExceptions;
+        StringBuilder sb = new StringBuilder();
+        for (String e: shown) {
+            sb.append(e);
+            Double s = checkedExceptionScores.get(e);
+            if (s != null) {
+                sb.append(" (score ").append(s).append(")");
+            }
+            sb.append(", ");
+        }
+        return sb.length() >= 2 ? sb.substring(0, sb.length() - 2) : sb.toString();
     }
 
     public boolean hasDescription() {

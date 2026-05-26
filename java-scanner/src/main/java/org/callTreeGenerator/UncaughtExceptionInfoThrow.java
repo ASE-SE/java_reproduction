@@ -6,6 +6,9 @@ public class UncaughtExceptionInfoThrow extends UncaughtExceptionInfo {
 
     private List<ThrowExceptionInfo> uncaughtThrowExceptionInfo; // 异常类型与uncaughtExceptions表中匹配的throw语句
     private List<ThrowExceptionInfo> checkedUncaughtThrowExceptionInfo = null; // 经LLM筛选后得到的需关注throw
+    // Per-throw LLM remarks. Keyed by the ThrowExceptionInfo identity so re-ordering or filtering
+    // does not lose the mapping; LinkedHashMap preserves insertion order for stable prompt output.
+    private final LinkedHashMap<ThrowExceptionInfo, String> throwDescriptions = new LinkedHashMap<>();
 
     public UncaughtExceptionInfoThrow(MethodTreeNode methodTreeNode, List<MethodTreeNode> nodeRoute, Set<String> uncaughtExceptions) {
         super(methodTreeNode, nodeRoute, uncaughtExceptions);
@@ -38,6 +41,29 @@ public class UncaughtExceptionInfoThrow extends UncaughtExceptionInfo {
             return;
         }
         this.checkedUncaughtThrowExceptionInfo.remove(checkedUncaughtThrowExceptionInfo);
+    }
+
+    public void setThrowDescription(ThrowExceptionInfo throwInfo, String remark) {
+        if (throwInfo == null || remark == null || remark.isEmpty()) return;
+        throwDescriptions.put(throwInfo, remark);
+    }
+
+    public String getThrowDescription(ThrowExceptionInfo throwInfo) {
+        if (throwInfo == null) return null;
+        return throwDescriptions.get(throwInfo);
+    }
+
+    // 每条 throw 的 triage 单分(可达性+危害综合), 用于在修复 prompt 里附带显示。
+    private final LinkedHashMap<ThrowExceptionInfo, Double> throwScores = new LinkedHashMap<>();
+
+    public void setThrowScores(Map<ThrowExceptionInfo, Double> scores) {
+        throwScores.clear();
+        if (scores != null) throwScores.putAll(scores);
+    }
+
+    public Double getThrowScore(ThrowExceptionInfo throwInfo) {
+        if (throwInfo == null) return null;
+        return throwScores.get(throwInfo);
     }
 
     public String toString() {

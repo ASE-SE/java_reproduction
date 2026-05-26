@@ -4,8 +4,13 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class LLMResponse {
     private String id;
@@ -124,16 +129,207 @@ public class LLMResponse {
         }
     }
 
+    public static Map<String, String> parseTaggedMessage(String string) {
+        Map<String, String> result = new HashMap<>();
+        result.put("analysis", extractTag(string, "analysis", false));
+        result.put("answer", extractTag(string, "answer", false));
+        result.put("result", extractTag(string, "result", true));
+        result.put("remark", extractTag(string, "remark", false));
+        return result;
+    }
+
+    public static String extractTag(String string, String tag, boolean required) {
+        if (string == null) {
+            if (required) throw new IllegalArgumentException("LLM response is null");
+            return "";
+        }
+        Pattern pattern = Pattern.compile(
+                "(?is)<\\s*" + Pattern.quote(tag) + "\\s*>\\s*(.*?)\\s*<\\s*/\\s*" + Pattern.quote(tag) + "\\s*>"
+        );
+        Matcher matcher = pattern.matcher(string);
+        // 取最后一个匹配：LLM 偶尔会在 <analysis> 里讨论 "<result>" 时漏掉转义，
+        // 真正的答案总是最后那一个；找到多个时记一条 fine 级日志便于排查。
+        String last = null;
+        int count = 0;
+        while (matcher.find()) {
+            last = matcher.group(1).trim();
+            count++;
+        }
+        if (last != null) {
+            if (count > 1) {
+                LOGGER_FINE("multiple <" + tag + "> tags (n=" + count + "), using last");
+            }
+            return stripCode(last);
+        }
+        if (required) {
+            throw new IllegalArgumentException("missing <" + tag + "> in LLM response");
+        }
+        return "";
+    }
+
+    private static final java.util.logging.Logger LLM_RESPONSE_LOGGER = java.util.logging.Logger.getLogger("MAIN");
+    private static void LOGGER_FINE(String msg) { LLM_RESPONSE_LOGGER.fine(msg); }
+
+    public static List<String> parseResultStringList(String string) {
+        String result = extractTag(string, "result", true).trim();
+        Type listType = new TypeToken<List<String>>() {}.getType();
+        try {
+            List<String> parsed = new Gson().fromJson(result, listType);
+            return parsed == null ? new ArrayList<>() : parsed;
+        } catch (JsonSyntaxException ignored) {
+            return parseQuotedStringList(result);
+        }
+    }
+
+    /**
+     * 解析 triage 打分结果。<result> 段内应是纯数字 JSON:
+     *   {"scores":[{"index":1,"score":0.8},{"index":2,"score":0.3}]}
+     * 单分制: 一个分数同时权衡可达性 + 危害性。
+     * 三层防御:
+     *   1. Gson 严格解析
+     *   2. 失败 → 正则抓 (index, score) 数字对兜底 (因为只含数字, 几乎不会失败)
+     *      兼容旧字段名 likelihood (单分时同义)。
+     * 返回 index -> score 的映射。空 <result> / 无匹配 → 空 Map。
+     */
+    public static Map<Integer, Double> parseScores(String string) {
+        String result = extractTag(string, "result", true).trim();
+        Map<Integer, Double> out = new HashMap<>();
+        // 1) 严格 JSON
+        try {
+            Map<String, Object> root = new Gson().fromJson(result, new TypeToken<Map<String, Object>>(){}.getType());
+            if (root != null && root.get("scores") instanceof List) {
+                for (Object o : (List<?>) root.get("scores")) {
+                    if (!(o instanceof Map)) continue;
+                    Map<?, ?> m = (Map<?, ?>) o;
+                    Object idx = m.get("index");
+                    Object sc = m.get("score");
+                    if (sc == null) sc = m.get("likelihood"); // 兼容旧字段名
+                    if (idx == null || sc == null) continue;
+                    try {
+                        out.put((int) Math.round(Double.parseDouble(idx.toString())),
+                                Double.parseDouble(sc.toString()));
+                    } catch (NumberFormatException ignore) { /* skip */ }
+                }
+                if (!out.isEmpty()) return out;
+            }
+        } catch (JsonSyntaxException | NumberFormatException ignored) {
+            // fall through to regex
+        }
+        // 2) 正则兜底: 抓每个 {... "index": N ... "score": F ...} 里的两个数字 (兼容 likelihood)
+        Matcher m = Pattern.compile(
+                "(?is)\"index\"\\s*:\\s*(\\d+)[^}]*?\"(?:score|likelihood)\"\\s*:\\s*([0-9]*\\.?[0-9]+)"
+        ).matcher(result);
+        while (m.find()) {
+            try {
+                out.put(Integer.parseInt(m.group(1)), Double.parseDouble(m.group(2)));
+            } catch (NumberFormatException ignore) { /* skip */ }
+        }
+        // 兼容 score 在 index 之前的顺序
+        if (out.isEmpty()) {
+            Matcher m2 = Pattern.compile(
+                    "(?is)\"(?:score|likelihood)\"\\s*:\\s*([0-9]*\\.?[0-9]+)[^}]*?\"index\"\\s*:\\s*(\\d+)"
+            ).matcher(result);
+            while (m2.find()) {
+                try {
+                    out.put(Integer.parseInt(m2.group(2)), Double.parseDouble(m2.group(1)));
+                } catch (NumberFormatException ignore) { /* skip */ }
+            }
+        }
+        return out;
+    }
+
+    private static List<String> parseQuotedStringList(String string) {
+        List<String> result = new ArrayList<>();
+        Matcher matcher = Pattern.compile("\"([^\"]+)\"|'([^']+)'").matcher(string);
+        while (matcher.find()) {
+            String value = matcher.group(1) != null ? matcher.group(1) : matcher.group(2);
+            if (value != null && !value.isBlank()) {
+                result.add(value.trim());
+            }
+        }
+        if (result.isEmpty() && string.replaceAll("[\\[\\]\\s,]", "").isEmpty()) {
+            return result;
+        }
+        if (result.isEmpty()) {
+            throw new IllegalArgumentException("cannot parse <result> as string list: " + string);
+        }
+        return result;
+    }
+
+    public static String parseResultChoice(String string, String... allowedValues) {
+        String result = extractTag(string, "result", true).trim();
+        String normalized = result.toLowerCase();
+        // Strip surrounding quotes / trailing punctuation that LLM may add.
+        if (normalized.length() >= 2
+                && ((normalized.startsWith("\"") && normalized.endsWith("\""))
+                    || (normalized.startsWith("'") && normalized.endsWith("'")))) {
+            normalized = normalized.substring(1, normalized.length() - 1).trim();
+        }
+        normalized = normalized.replaceAll("[.\"'!?]+$", "").trim();
+
+        // Pass 1: exact match — what the prompt explicitly asks for.
+        for (String allowedValue : allowedValues) {
+            if (normalized.equals(allowedValue)) {
+                return allowedValue;
+            }
+        }
+        // Pass 2: token-boundary startsWith — accepts "no catch — because ..." style answers.
+        for (String allowedValue : allowedValues) {
+            if (normalized.startsWith(allowedValue)) {
+                int next = allowedValue.length();
+                if (normalized.length() == next || !Character.isLetterOrDigit(normalized.charAt(next))) {
+                    return allowedValue;
+                }
+            }
+        }
+        // Pass 3: whole-word substring count. Order-independent so the first option in the
+        // arglist no longer wins by accident; ambiguous matches collapse to "unknown" when allowed.
+        String matched = null;
+        int matches = 0;
+        for (String allowedValue : allowedValues) {
+            Pattern pattern = Pattern.compile("(?<![a-z0-9])" + Pattern.quote(allowedValue) + "(?![a-z0-9])");
+            if (pattern.matcher(normalized).find()) {
+                matches++;
+                matched = allowedValue;
+            }
+        }
+        if (matches == 1) return matched;
+        if (matches > 1) {
+            for (String allowedValue : allowedValues) {
+                if (allowedValue.equals("unknown")) return "unknown";
+            }
+        }
+        throw new IllegalArgumentException("unexpected <result>: " + result);
+    }
+
+    public static List<String> splitTaggedMessages(String string) {
+        List<String> result = new ArrayList<>();
+        if (string == null || string.isBlank()) {
+            return result;
+        }
+        Matcher matcher = Pattern.compile("(?is)<\\s*analysis\\s*>.*?<\\s*/\\s*remark\\s*>").matcher(string);
+        while (matcher.find()) {
+            result.add(matcher.group().trim());
+        }
+        if (result.isEmpty()) {
+            result.add(string.trim());
+        }
+        return result;
+    }
+
     public static String stripCode(String string) {
         if (string == null) {
             return "";
         }
-        if (string.startsWith("```java\n") && string.endsWith("```")) {
-            return string.substring("```java\n".length(), string.length() - "```".length());
-        } else if (string.startsWith("```\n") && string.endsWith("```")) {
-            return string.substring("```\n".length(), string.length() - "```".length());
-        } else {
-            return string;
+        // 放宽起止匹配：```java / ```Java / ``` 后接可选空白和换行；结尾允许 ``` 后接空白。
+        // 一旦同时识别到首尾 fence，就把它们剥掉；只匹配一对，避免误伤代码里出现的 ```。
+        Pattern open = Pattern.compile("(?s)\\A```[ \\t]*([A-Za-z0-9_+\\-]*)[ \\t]*\\r?\\n");
+        Pattern close = Pattern.compile("(?s)\\r?\\n[ \\t]*```[ \\t]*\\z");
+        Matcher openMatch = open.matcher(string);
+        Matcher closeMatch = close.matcher(string);
+        if (openMatch.find() && closeMatch.find() && openMatch.end() <= closeMatch.start()) {
+            return string.substring(openMatch.end(), closeMatch.start());
         }
+        return string;
     }
 }

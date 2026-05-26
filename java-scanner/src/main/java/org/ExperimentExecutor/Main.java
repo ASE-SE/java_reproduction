@@ -24,12 +24,27 @@ import java.util.stream.Collectors;
 public class Main {
     private static final Logger LOGGER = Logger.getLogger("MAIN");
     private static String EXPERIMENT_MARK;
+    // 当 triage 把所有静态候选全部否决时：
+    //   false（默认，方案 C）：跳过主问题，直接把 methodBefore 作为 result 返回 → changed=0
+    //   true（方案 A）：回退到原始全集，仍调一次主问题（保留原始 fallback 行为，便于 A/B 对比）
+    private static boolean TRIAGE_EMPTY_FALLBACK;
+    // triage 前的候选数上限：静态候选超过此数时，按调用深度从深到浅修剪到该上限。
+    // 0 = 无上限（全留）。默认 100。
+    private static int STATIC_CANDIDATE_CAP = 100;
     private static Gson gson = new Gson();
     static {
         Properties prop = new Properties();
         try (FileInputStream fis = new FileInputStream("config.properties")) {
             prop.load(fis);
             EXPERIMENT_MARK = prop.getProperty("EXPERIMENT_MARK");
+            TRIAGE_EMPTY_FALLBACK = Boolean.parseBoolean(
+                    prop.getProperty("TRIAGE_EMPTY_FALLBACK", "false").trim());
+            try {
+                STATIC_CANDIDATE_CAP = Integer.parseInt(
+                        prop.getProperty("STATIC_CANDIDATE_CAP", "100").trim());
+            } catch (NumberFormatException nfe) {
+                STATIC_CANDIDATE_CAP = 100;
+            }
         } catch (IOException e) {
             LOGGER.severe("config loading failed: " + e.getMessage());
             throw new RuntimeException(e);
@@ -225,7 +240,7 @@ public class Main {
         GraphNodeTraversal graphNodeTraversal = new GraphNodeTraversal(exceptionCharacteristicManager);
         List<UncaughtExceptionInfo> exceptionResults = graphNodeTraversal.getSuspiciousThrows(graph, root);
         Integer layer = 10;
-        while(exceptionResults.size() > 30 && layer > 3) {
+        while(STATIC_CANDIDATE_CAP > 0 && exceptionResults.size() > STATIC_CANDIDATE_CAP && layer > 3) {
             Integer finalLayer = layer;
             exceptionResults.removeIf(info -> info.getNodeRoute().size() - 1 > finalLayer);
             layer --;
@@ -248,7 +263,18 @@ public class Main {
                 .filter(UncaughtExceptionInfo::isContainUncaughtExceptions)
                 .collect(Collectors.toList());
         if (checkedExceptionResults.isEmpty()) {
-            checkedExceptionResults = exceptionResults;
+            if (TRIAGE_EMPTY_FALLBACK) {
+                // 方案 A：回退全集，仍走主问题（保留旧行为，便于对比）
+                LOGGER.info("triage left no candidates; TRIAGE_EMPTY_FALLBACK=true, falling back to full set: " + targetMethod.getName());
+                checkedExceptionResults = exceptionResults;
+            } else {
+                // 方案 C：triage 全否决 → 跳过主问题，结果 = 原方法
+                // 静态分析 + LLM 语义判断都不认为需要 catch，无需再问主模型
+                LOGGER.info("triage left no candidates; skipping main question (TRIAGE_EMPTY_FALLBACK=false): " + targetMethod.getName());
+                data.setMethodResult(root.getCode());
+                LOGGER.info("finish analyze： " + targetMethod.getName());
+                return data;
+            }
         }
 
         // 使用大语言模型处理捕获端
